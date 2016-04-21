@@ -415,6 +415,19 @@ void BattlescapeGame::endTurn()
 						(*it)->setFuseTimer((*it)->getFuseTimer() - 1);
 					}
 			}
+			
+			if(Options::battleAlienShootBlindly) //enabled "aliens shoot blindly" by psyHoTik.
+			{ //update getTurnsSinceSpotted after every turn, not after human and alien turn
+			  // Updating getTurnsSinceSpotted in every turn fixes shoots blindly to spotted x-com operative when alien that spotted x-com operative was killed in human turn
+			  // You need to correct _intelligence like _intelligence = ( _unit->getIntelligence() )*2 in AlienBAIState.cpp
+				for (std::vector<BattleUnit*>::iterator i = _save->getUnits()->begin(); i != _save->getUnits()->end(); ++i)
+				{
+						if ((*i)->getTurnsSinceSpotted() < 255)
+						{
+							(*i)->setTurnsSinceSpotted((*i)->getTurnsSinceSpotted() +	1);
+						}
+				}
+			}
 		}
 
 
