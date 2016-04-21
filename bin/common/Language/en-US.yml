@@ -1,4 +1,6 @@
 en-US:
+  STR_BATTLEINCREASESURVIVABILITY: "Increase survivability of x-com soldiers"
+  STR_BATTLEINCREASESURVIVABILITY_DESC: "Healthly soldier with high morale and bravery has a chance to lose consciousness instead of dying after a mortal hit. Soldiers with high bravery are more likely to survive a mortal hit."
   STR_OPENXCOM: "OpenXcom"
   STR_NEW_GAME: "New Game"
   STR_LOAD_SAVED_GAME: "Load Game"
