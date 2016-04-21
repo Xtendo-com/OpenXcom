@@ -37,6 +37,7 @@
 #include "SavedBattleGame.h"
 #include "BattleUnitStatistics.h"
 #include "../fmath.h"
+#include "../Engine/Logger.h"
 
 namespace OpenXcom
 {
@@ -1172,10 +1173,42 @@ int BattleUnit::damage(const Position &relative, int power, ItemDamageType type,
 		else
 		{
 			// health damage
-			_health -= power;
-			if (_health < 0)
+			if (Options::battleIncreaseSurvivability) //enabled "Increase survivability of x-com soldiers" by Xtendo-com
 			{
-				_health = 0;
+				int temphealth=_health; //remember HP before damage calculation
+				_health -= power;
+				if (_health <= 0)
+				{
+					if (_faction==FACTION_PLAYER) //Log mortal hits only for player side
+					{
+						Log(LOG_VERBOSE) << "chance to survive a mortal hit was : " 
+									 << "health " << (_stats.health+_health)/3 << "% + "
+									 << "morale " << _morale/3 << "% + "
+									 << "bravery " << _stats.bravery/2 << "% "
+									 << "= " << (_stats.health+_health)/3 + _morale/3 + _stats.bravery/2 << "%";
+					}
+					//Rule to survive a mortal hit
+					if (RNG::percent( 
+									 (_stats.health+_health)/3  // take 33% from (MAX HP - overkill HP)
+									 + _morale/3 				// take 33% from current morale
+									 +_stats.bravery/2) && 		// take 50% from current bravery
+					   (_faction==FACTION_PLAYER) && //Applied only to x-com operatives
+					   (type!=DT_HE) && //X-com operative can't survive from explosion
+					   (_armor->getSize() == 1)) //don't apply this rule to tanks
+						  {
+							  _health = _stats.health/5; //if x-com operative survived by this rule, recover only 20% HP from MAX HP
+							  _stunlevel = _stats.health/5 + _stunlevel; //also add 20% from MAX HP to stun level
+						  }
+					else _health=0; //not passed a rule, die.
+				}				
+			}
+			else //disabled "Increase survivability of x-com soldiers" by Xtendo-com
+			{
+				_health -= power;
+				if (_health < 0)
+					{
+					_health=0;
+					}
 			}
 
 			if (type != DT_IN)
