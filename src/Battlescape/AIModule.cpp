@@ -53,7 +53,14 @@ AIModule::AIModule(SavedBattleGame *save, BattleUnit *unit, Node *node) : _save(
 	_traceAI = Options::traceAI;
 
 	_reserve = BA_NONE;
-	_intelligence = _unit->getIntelligence();
+	if(Options::battleAlienShootBlindly) //enabled "aliens shoot blindly" by psyHoTik.
+	{ //make correction for _intelligence since we update getTurnsSinceSpotted in every turn, not after human and alien turn. Updating getTurnsSinceSpotted in every turn fixes shoots blindly to spotted x-com operative when alien that spotted x-com operative was killed in human turn.
+		_intelligence = ( _unit->getIntelligence() )*2;
+	}
+	else //disabled "aliens shoot blindly" by psyHoTik.
+	{ //don't make correction for _intelligence since we update getTurnsSinceSpotted only after human and alien turn.
+		_intelligence = _unit->getIntelligence();
+	}
 	_escapeAction = new BattleAction();
 	_ambushAction = new BattleAction();
 	_attackAction = new BattleAction();
@@ -1062,8 +1069,10 @@ int AIModule::selectNearestTarget()
 	Position target;
 	for (std::vector<BattleUnit*>::const_iterator i = _save->getUnits()->begin(); i != _save->getUnits()->end(); ++i)
 	{
-		if (validTarget(*i, true, _unit->getFaction() == FACTION_HOSTILE) &&
-			_save->getTileEngine()->visible(_unit, (*i)->getTile()))
+		if ( (validTarget(*i, true, true) &&
+			_save->getTileEngine()->visible(_unit, (*i)->getTile()) && !Options::battleAlienShootBlindly) //check for disabled switch "aliens shoot blindly" by psyHoTik. Modified check.
+			//additional check for "aliens shoot blindly" by psyHoTik
+		    || (validTarget(*i, true, true) && (*i)->getTurnsSinceSpotted() == 0 && Options::battleAlienShootBlindly) ) //enabled "aliens shoot blindly" by psyHoTik 
 		{
 			tally++;
 			int dist = _save->getTileEngine()->distance(_unit->getPosition(), (*i)->getPosition());

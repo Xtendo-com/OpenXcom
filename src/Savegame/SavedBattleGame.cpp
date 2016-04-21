@@ -864,13 +864,23 @@ void SavedBattleGame::endTurn()
 		// update the "number of turns since last spotted"
 		for (std::vector<BattleUnit*>::iterator i = _units.begin(); i != _units.end(); ++i)
 		{
-			if ((*i)->getTurnsSinceSpotted() < 255)
-			{
-				(*i)->setTurnsSinceSpotted((*i)->getTurnsSinceSpotted() +	1);
+			if (Options::battleAlienShootBlindly) //enabled aliens shoot blindly by psyHoTik.
+			{ //Don't let aliens to shoot your soldiers blindly without detection of x-com operative position in cheat turns
+				if (_cheating && (*i)->getFaction() == FACTION_PLAYER && !(*i)->isOut())
+				{
+					(*i)->setTurnsSinceSpotted(1);
+				}
 			}
-			if (_cheating && (*i)->getFaction() == FACTION_PLAYER && !(*i)->isOut())
+			else //disabled aliens shoot blindly by psyHoTik.
 			{
-				(*i)->setTurnsSinceSpotted(0);
+				if ((*i)->getTurnsSinceSpotted() < 255)
+				{
+					(*i)->setTurnsSinceSpotted((*i)->getTurnsSinceSpotted() +	1);
+				}
+				if (_cheating && (*i)->getFaction() == FACTION_PLAYER && !(*i)->isOut())
+				{
+					(*i)->setTurnsSinceSpotted(0);
+				}
 			}
 		}
 	}
