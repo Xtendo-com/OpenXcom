@@ -968,6 +968,46 @@ void Map::drawTerrain(Surface *surface)
 								tmpSurface->blitNShade(surface, screenPosition.x, screenPosition.y - tile->getMapData(O_OBJECT)->getYOffset(), tileShade, false);
 						}
 					}
+					
+					//advanced scanner by redv
+					//don't show floor of scanned unit by Xtendo-com
+					if (Options::battleAdvancedScanner)
+					{
+						//Advanced scanner Step 1 : check all levels for valid scanned unit but with fixed X and Y coordinates
+						bool allowscandraw = false;
+						int HighZ=_save->getMapSizeZ()-1;
+						for (int tempZ = 0; tempZ <= HighZ; tempZ++) //Let's try to check all levels for scanned unit
+						{
+							Tile *scantile = _save->getTile(Position(itX, itY, tempZ)); //get tile with specified X,Y,Z coordinates
+							BattleUnit *scanunit = _save->selectUnit(Position(itX, itY, tempZ)); //get unit from tile 
+							if (scanunit && //is tile contains unit?
+								scanunit->getScannedTurn() == _save->getTurn() //is we scanned enemy in that turn?
+								&& _save->getSide() == FACTION_PLAYER //we want to draw scan results only in player turn
+								&& !scanunit->getVisible()) //don't draw scan result if enemy is already visible
+							{
+								allowscandraw = true; //tile contains a scanned unit, step 1 passed
+								break;
+							}
+						}
+						//Advanced scanner Step 2 : if step 1 passes, let's try to draw scan result in battlescape in every seleted by user floor
+						if (allowscandraw && //is passed 1 step?
+							_camera->getViewLevel()==itZ && //draw scan result only in current level, not in all floors at once
+							!(_selectorX == itX && _selectorY == itY && _camera->getViewLevel() == itZ)) //don't draw scan result if cursor already points to them)
+						{
+							tmpSurface = _game->getMod()->getSurfaceSet("CURSOR.PCK")->getFrame(0);	// back of red box
+							tmpSurface->blitNShade(surface, screenPosition.x, screenPosition.y, 0); // draw back of red box
+							tmpSurface = _game->getMod()->getSurfaceSet("CURSOR.PCK")->getFrame(3);	// front of red box
+							tmpSurface->blitNShade(surface, screenPosition.x, screenPosition.y, 6); // draw front of red box
+							//Output text "scan" in upper of red box
+							std::ostringstream ss;
+							ss << "scan";
+							_txtAccuracy->setText(Language::utf8ToWstr(ss.str()));
+							_txtAccuracy->draw();
+							_txtAccuracy->blitNShade(surface, screenPosition.x, screenPosition.y, 0);
+						}
+					}
+					
+					
 					// Draw cursor front
 					if (_cursorType != CT_NONE && _selectorX > itX - _cursorSize && _selectorY > itY - _cursorSize && _selectorX < itX+1 && _selectorY < itY+1 && !_save->getBattleState()->getMouseOverIcons())
 					{
