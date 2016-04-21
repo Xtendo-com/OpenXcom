@@ -52,7 +52,9 @@ BattleUnit::BattleUnit(Soldier *soldier, int depth) :
 	_verticalDirection(0), _status(STATUS_STANDING), _walkPhase(0), _fallPhase(0), _kneeled(false), _floating(false),
 	_dontReselect(false), _fire(0), _currentAIState(0), _visible(false), _cacheInvalid(true),
 	_expBravery(0), _expReactions(0), _expFiring(0), _expThrowing(0), _expPsiSkill(0), _expPsiStrength(0), _expMelee(0),
-	_motionPoints(0), _kills(0), _hitByFire(false), _moraleRestored(0), _coverReserve(0), _charging(0), _turnsSinceSpotted(255),
+	_motionPoints(0),
+	_scannedTurn(-1), //advanced scanner by redv
+	_kills(0), _hitByFire(false), _moraleRestored(0), _coverReserve(0), _charging(0), _turnsSinceSpotted(255),
 	_statistics(), _murdererId(0), _mindControllerID(0), _fatalShotSide(SIDE_FRONT), _fatalShotBodyPart(BODYPART_HEAD),
 	_geoscapeSoldier(soldier), _unitRules(0), _rankInt(0), _turretType(-1), _hidingForTurn(false), _respawn(false)
 {
@@ -164,7 +166,9 @@ BattleUnit::BattleUnit(Unit *unit, UnitFaction faction, int id, Armor *armor, St
 	_toDirectionTurret(0),  _verticalDirection(0), _status(STATUS_STANDING), _walkPhase(0),
 	_fallPhase(0), _kneeled(false), _floating(false), _dontReselect(false), _fire(0), _currentAIState(0),
 	_visible(false), _cacheInvalid(true), _expBravery(0), _expReactions(0), _expFiring(0),
-	_expThrowing(0), _expPsiSkill(0), _expPsiStrength(0), _expMelee(0), _motionPoints(0), _kills(0), _hitByFire(false),
+	_expThrowing(0), _expPsiSkill(0), _expPsiStrength(0), _expMelee(0), _motionPoints(0),
+ 	_scannedTurn(-1), //advanced scanner by redv
+	_kills(0), _hitByFire(false),
 	_moraleRestored(0), _coverReserve(0), _charging(0), _turnsSinceSpotted(255),
 	_statistics(), _murdererId(0), _mindControllerID(0), _fatalShotSide(SIDE_FRONT),
 	_fatalShotBodyPart(BODYPART_HEAD), _armor(armor),  _geoscapeSoldier(0), _unitRules(unit),

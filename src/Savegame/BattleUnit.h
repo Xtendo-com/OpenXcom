@@ -89,6 +89,7 @@ private:
 	int _expBravery, _expReactions, _expFiring, _expThrowing, _expPsiSkill, _expPsiStrength, _expMelee;
 	int improveStat(int exp) const;
 	int _motionPoints;
+	int _scannedTurn; //advanced scanner by redv
 	int _kills;
 	int _faceDirection; // used only during strafeing moves
 	bool _hitByFire;
@@ -344,6 +345,10 @@ public:
 	void stimulant (int energy, int stun);
 	/// Get motion points for the motion scanner.
 	int getMotionPoints() const;
+	/// Get turn when unit was scanned by the motion scanner.
+	int getScannedTurn() const     {return _scannedTurn;} //advanced scanner by redv
+	/// Set turn when unit was scanned by the motion scanner.
+	void setScannedTurn(int turn)  {_scannedTurn = turn;} //advanced scanner by redv
 	/// Gets the unit's armor.
 	Armor *getArmor() const;
 	/// Gets the unit's name.
