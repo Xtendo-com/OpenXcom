@@ -891,6 +891,50 @@ void SavedBattleGame::endTurn()
 			(*i)->setVisible(false);
 		}
 	}
+  // Manual control of civilians by yrizoud
+  for (std::vector<BattleUnit*>::iterator i = getUnits()->begin(); i != getUnits()->end(); ++i)
+  { //find civilian from array of units
+    if ((*i)->getOriginalFaction() != FACTION_NEUTRAL || (*i)->isOut())
+      continue; //skip unit if not civilian
+    Position origin = (*i)->getPosition(); //get X,Y,Z coordinats of civilian
+	  Position originVoxel = getTileEngine()->getSightOriginVoxel(*i);
+	  originVoxel.z -= 4;
+	
+  	for (std::vector<BattleUnit*>::const_iterator j = getUnits()->begin(); j != getUnits()->end(); ++j)
+  	{//find x-com operative from array of units
+  		if ((*j)->isOut() || (*j)->getFaction() != FACTION_PLAYER || (*j)->getOriginalFaction() != FACTION_PLAYER)
+  		  continue; //skip unit if not x-com operative
+			Position target = (*j)->getPosition(); //get X,Y,Z coordinats of x-com operative
+
+		  //check for distance from x-com operative to civilian, but do not care about obstacles like walls
+		  const int horiz_dist = 8; //X and Y distance
+		  const int vert_dist =3;   //Z distance
+			if (target.x >= origin.x - horiz_dist && target.x <= origin.x + horiz_dist
+			&& target.y >= origin.y - horiz_dist && target.y <= origin.y + horiz_dist
+			&& target.z >= origin.z - vert_dist && target.z <= origin.z + vert_dist)
+			{
+			  Position dummy;
+				//check for visability from x-com to civilian (check for obstacles like walls)
+				if (getTileEngine()->visible((*i), (*j)->getTile()))
+				{
+					// if passed distance and visability check
+					// get control of civilian like you use a mind-control
+					(*i)->convertToFaction(FACTION_PLAYER);
+					getTileEngine()->calculateFOV(origin);
+					getTileEngine()->calculateUnitLighting();
+					(*i)->setTimeUnits((*i)->getBaseStats()->tu);
+					(*i)->setEnergy((*i)->getBaseStats()->stamina);
+					//(*i)->recoverTimeUnits(); //don't use, freezes game after civilian move
+					(*i)->allowReselect();
+					continue;
+				// Another way to check visability is to calculate shoot trajectory in voxel world
+				// but this fails when an other civilian is in the way
+				// || getTileEngine()->canTargetUnit(&originVoxel, (*j)->getTile(), &dummy, *i, *j))
+				}
+			}
+    }
+  }
+  //--
 
 	// re-run calculateFOV() *after* all aliens have been set not-visible
 	_tileEngine->recalculateFOV();

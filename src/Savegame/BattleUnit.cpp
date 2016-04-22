@@ -1639,7 +1639,8 @@ void BattleUnit::prepareNewTurn(bool fullProcess)
 	if (_faction != _originalFaction)
 	{
 		_faction = _originalFaction;
-		return;
+		// Manual control of civilians by yrizoud
+		if (_originalFaction!=FACTION_NEUTRAL) return;
 	}
 
 	_unitsSpottedThisTurn.clear();

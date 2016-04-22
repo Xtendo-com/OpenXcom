@@ -725,6 +725,47 @@ void BattlescapeGame::checkForCasualties(BattleItem *murderweapon, BattleUnit *m
 						}
 					}
 				}
+				// Manual control of civilians by yrizoud
+				if (victim->getOriginalFaction() == FACTION_NEUTRAL)
+				{
+					int modifier = _save->getMoraleModifier();
+					int loserMod = victim->getFaction() == FACTION_HOSTILE ? 100 : _save->getMoraleModifier();
+					int winnerMod = victim->getFaction() == FACTION_HOSTILE ? _save->getMoraleModifier() : 100;
+					for (std::vector<BattleUnit*>::iterator i = _save->getUnits()->begin(); i != _save->getUnits()->end(); ++i)
+					{
+						if (!(*i)->isOut() && (*i)->getArmor()->getSize() == 1)
+						{
+							// the losing squad all get a morale loss
+							if ((*i)->getOriginalFaction() == FACTION_PLAYER)
+							{
+								int bravery = (110 - (*i)->getBaseStats()->bravery) / 10;
+								(*i)->moraleChange(-(modifier * 200 * bravery / loserMod / 100));
+								Log(LOG_INFO) << "Morale change for x-com: " << -(modifier * 200 * bravery / loserMod / 100);
+							}
+							else if ((*i)->getOriginalFaction() == FACTION_NEUTRAL && !(*i)->getFaction() == FACTION_PLAYER)
+							{
+								int bravery = (110 - (*i)->getBaseStats()->bravery) / 10;
+								(*i)->moraleChange(-60);
+								Log(LOG_INFO) << "Morale change for cilivian: " << -(60);
+								//Log(LOG_INFO) << "Morale change for cilivian: " << bravery;
+							}
+							else if ((*i)->getOriginalFaction() == FACTION_NEUTRAL && (*i)->getFaction() == FACTION_PLAYER)
+								{
+								int bravery = (110 - (*i)->getBaseStats()->bravery) / 10;
+								//(*i)->moraleChange(-(modifier * 200 * bravery / loserMod / 100));
+								(*i)->moraleChange(-100);
+								Log(LOG_INFO) << "Morale change for x-com civilian: " << -100;
+								}
+							// the winning squad all get a morale increase
+							else if ((*i)->getOriginalFaction() == FACTION_HOSTILE)
+							{
+								(*i)->moraleChange(10 * winnerMod / 100);
+								Log(LOG_INFO) << "Morale change for aliens " << 10 * winnerMod / 100;
+							}
+						}
+					}
+				}
+				
 				if (murderweapon)
 				{
 					statePushNext(new UnitDieBState(this, (*j), murderweapon->getRules()->getDamageType(), noSound, noCorpse));
@@ -1242,7 +1283,8 @@ bool BattlescapeGame::handlePanickingPlayer()
 {
 	for (std::vector<BattleUnit*>::iterator j = _save->getUnits()->begin(); j != _save->getUnits()->end(); ++j)
 	{
-		if ((*j)->getFaction() == FACTION_PLAYER && (*j)->getOriginalFaction() == FACTION_PLAYER && handlePanickingUnit(*j))
+		// Manual control of civilians by yrizoud
+		if ((*j)->getFaction() == FACTION_PLAYER && ( (*j)->getOriginalFaction() == FACTION_PLAYER || (*j)->getOriginalFaction() == FACTION_NEUTRAL ) && handlePanickingUnit(*j))
 			return false;
 	}
 	return true;
