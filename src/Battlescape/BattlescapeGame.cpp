@@ -706,20 +706,105 @@ void BattlescapeGame::checkForCasualties(BattleItem *murderweapon, BattleUnit *m
 							{
 								int bravery = (110 - (*i)->getBaseStats()->bravery) / 10;
 								(*i)->moraleChange(-(modifier * 200 * bravery / loserMod / 100));
-
+							
 								if (victim->getFaction() == FACTION_HOSTILE && murderer)
 								{
 									murderer->setTurnsSinceSpotted(0);
 								}
 							}
+							
+							// enabled "Extend civilians behaviour" by Xtendo-com.
+							else if (Options::battleExtenedCivilians && victim->getOriginalFaction()!=FACTION_PLAYER && (*i)->getOriginalFaction() != FACTION_NEUTRAL)
+							{//Don't give a morale bonus for civilian after death of x-com operative
+								(*i)->moraleChange(10 * winnerMod / 100);
+							}
+							
 							// the winning squad all get a morale increase
-							else
+							else if (!Options::battleExtenedCivilians)
 							{
 								(*i)->moraleChange(10 * winnerMod / 100);
+							}
+						
+							// enabled "Extend civilians behaviour" by Xtendo-com. Handle morale after death of alien for civilans under player control.
+							if (Options::battleExtenedCivilians && victim->getOriginalFaction()==FACTION_HOSTILE && (*i)->getOriginalFaction()==FACTION_NEUTRAL && (*i)->getFaction()==FACTION_PLAYER)
+							{//Died alien, modify morale of civilian under player control
+								(*i)->moraleChange(10 * winnerMod / 100);
+								Log(LOG_VERBOSE) << "Killed alien. Morale change for x-com civilian: " << 10 * winnerMod / 100 << " (winnerMod: " << winnerMod << ")";
+							}
+
+							// enabled "Extend civilians behaviour" by Xtendo-com. Handle morale after death of alien for civilans not under player control.
+							else if (Options::battleExtenedCivilians && victim->getOriginalFaction()==FACTION_HOSTILE && (*i)->getOriginalFaction()==FACTION_NEUTRAL && (*i)->getFaction()==FACTION_NEUTRAL)
+							{//Died alien, modify morale of civilian not under player control
+								int tempi = RNG::generate(5,20);
+								(*i)->moraleChange(tempi);
+								Log(LOG_VERBOSE) << "Killed alien. Morale change for civilan: " << tempi;
+							}	
+							
+							// enabled "Extend civilians behaviour" by Xtendo-com. Handle morale after death of x-com operative for civilans under player control.
+							else if (Options::battleExtenedCivilians && victim->getOriginalFaction()==FACTION_PLAYER && (*i)->getOriginalFaction()==FACTION_NEUTRAL && (*i)->getFaction()==FACTION_PLAYER)
+							{//Died x-com operative, modify morale of civilian under player control
+								int bravery = (110 - 0) / 10;  //fixme. Bravery is hardcoded for civilian. 
+								(*i)->moraleChange(-(modifier * 200 * bravery / loserMod / 100));
+								Log(LOG_VERBOSE) << "Killed X-COM operative. Morale change for x-com civilian: " << -(modifier * 200 * bravery / loserMod / 100) << " (modifier: " << modifier << " bravery: " << bravery << " losermod: " << loserMod << ")";
+							}
+
+							// enabled "Extend civilians behaviour" by Xtendo-com. Handle morale after death of x-com operative for civilans not under player control.
+							else if (Options::battleExtenedCivilians && victim->getOriginalFaction()==FACTION_PLAYER && (*i)->getOriginalFaction()==FACTION_NEUTRAL && (*i)->getFaction()==FACTION_NEUTRAL)
+							{//Died x-com operative, modify morale of civilian not under player control
+								//int bravery = (110 - 0) / 10;  //fixme. Bravery is hardcoded for civilian. 
+								//(*i)->moraleChange(-(modifier * 200 * bravery / loserMod / 100));
+								//Log(LOG_INFO) << "Killed X-COM operative. Morale change for civilan: " << -(modifier * 200 * bravery / loserMod / 100) << " (modifier: " << modifier << " bravery: " << bravery << " losermod: " << loserMod << ")";
+								int tempi = RNG::generate(25,50);
+								(*i)->moraleChange(-tempi);
+								Log(LOG_VERBOSE) << "Killed X-COM operative. Morale change for civilan: " << -tempi;
 							}
 						}
 					}
 				}
+				// enabled "Extend civilians behaviour" by Xtendo-com. Handle morale for civilians
+				if (Options::battleExtenedCivilians && victim->getOriginalFaction() == FACTION_NEUTRAL)
+				{
+					int modifier = _save->getMoraleModifier(victim); //return always 100 anyway since the victim is civilian
+					int loserModCivil = _save->getMoraleModifier(victim); //return always 100 anyway since the victim is civilian
+					int loserModXCOM = _save->getMoraleModifier(); //returns x-com high ranked morale resist bonus, 125 MAX.				
+					int winnerMod = 100; //alien modificator morale bonus
+					for (std::vector<BattleUnit*>::iterator i = _save->getUnits()->begin(); i != _save->getUnits()->end(); ++i)
+					{
+						if (!(*i)->isOut() && (*i)->getArmor()->getSize() == 1)
+						{
+							if ((*i)->getOriginalFaction() == FACTION_PLAYER) // Killed civilian decreases morale of x-com operatives
+							{
+								int bravery = (110 - (*i)->getBaseStats()->bravery) / 10;
+								(*i)->moraleChange(-(modifier * 200 * bravery / loserModXCOM / 100));
+								Log(LOG_VERBOSE) << "Killed civilian. Morale change for x-com operative: " << -(modifier * 200 * bravery / loserModXCOM / 100) << " (modifier: " << modifier << " bravery: " << bravery << " losermod: " << loserModXCOM << ")";
+							}
+							else if ((*i)->getOriginalFaction() == FACTION_NEUTRAL && (*i)->getFaction() == FACTION_NEUTRAL) // Killed civilian decreases morale of civilians
+							{
+								//int bravery = (110 - (*i)->getBaseStats()->bravery) / 10 //civilian have 80 bravery stats... More bravery than x-com operatives...
+								//int bravery = (110 - 0) / 10; //fixme. Bravery is hardcoded for civilian.
+								//(*i)->moraleChange(-(modifier * 200 * bravery / loserModCivil/ 100));
+								//Log(LOG_INFO) << "Killed civilian. Morale change for civilian: " << -(modifier * 200 * bravery / loserModCivil / 100) << " (modifier: " << modifier << " bravery: " << bravery << " losermod: " << loserModCivil << ")";
+								int tempi = RNG::generate(25,50);
+								(*i)->moraleChange(-tempi);
+								Log(LOG_VERBOSE) << "Killed civilian. Morale change for civilan: " << -tempi;
+							}
+							else if ((*i)->getOriginalFaction() == FACTION_NEUTRAL && (*i)->getFaction() == FACTION_PLAYER) // Killed civilian decreases morale of controlled by x-com operatives civilians
+								{
+								//int bravery = (110 - (*i)->getBaseStats()->bravery) / 10 //civilian have 80 bravery stats... More bravery than x-com operatives...
+								int bravery = (110 - 0) / 10;  //fixme. Bravery is hardcoded for civilian. 
+								(*i)->moraleChange(-(modifier * 200 * bravery / loserModXCOM / 100));
+								Log(LOG_VERBOSE) << "Killed civilian. Morale change for x-com civilian: " << -(modifier * 200 * bravery / loserModXCOM / 100) << " (modifier: " << modifier << " bravery: " << bravery << " losermod: " << loserModXCOM << ")";
+								}
+							// the winning squad all get a morale increase
+							else if ((*i)->getOriginalFaction() == FACTION_HOSTILE) // Killed civilian increases a morale of aliens
+							{
+								(*i)->moraleChange(10 * winnerMod / 100);
+								Log(LOG_VERBOSE) << "Killed civilian. Morale change for aliens " << 10 * winnerMod / 100 << " (winnerMod: " << winnerMod << ")";
+							}
+						}
+					}
+				}
+				
 				if (murderweapon)
 				{
 					statePushNext(new UnitDieBState(this, (*j), murderweapon->getRules()->getDamageType(), noSound, noCorpse));
@@ -1240,8 +1325,18 @@ bool BattlescapeGame::handlePanickingPlayer()
 {
 	for (std::vector<BattleUnit*>::iterator j = _save->getUnits()->begin(); j != _save->getUnits()->end(); ++j)
 	{
-		if ((*j)->getFaction() == FACTION_PLAYER && (*j)->getOriginalFaction() == FACTION_PLAYER && handlePanickingUnit(*j))
-			return false;
+		if (Options::battleExtenedCivilians) // enabled "Extend civilians behaviour" by Xtendo-com
+		{ // check for panic also for controlled by player civilians
+			if ((*j)->getFaction() == FACTION_PLAYER && ( (*j)->getOriginalFaction() == FACTION_PLAYER ||
+				(*j)->getOriginalFaction() == FACTION_NEUTRAL )
+				&& handlePanickingUnit(*j))
+				return false;
+		}
+		else
+		{//disabled "Extend civilians behaviour" by Xtendo-com
+			if ((*j)->getFaction() == FACTION_PLAYER && (*j)->getOriginalFaction() == FACTION_PLAYER && handlePanickingUnit(*j))
+				return false;			
+		}
 	}
 	return true;
 }
@@ -1274,6 +1369,7 @@ bool BattlescapeGame::handlePanickingUnit(BattleUnit *unit)
 
 
 	int flee = RNG::generate(0,100);
+	if (Options::battleExtenedCivilians && unit->getOriginalFaction()==FACTION_NEUTRAL) flee = 0; // enabled "Extend civilians behaviour" by Xtendo-com. Civilans always flee in panic state.
 	BattleAction ba;
 	ba.actor = unit;
 	if (status == STATUS_PANICKING && flee <= 50) // 1/2 chance to freeze and 1/2 chance try to flee, STATUS_BERSERK is handled in the panic state.

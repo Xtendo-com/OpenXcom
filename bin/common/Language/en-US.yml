@@ -1,4 +1,6 @@
 en-US:
+  STR_BATTLEEXTENEDCIVILIANS_DESC: "Makes civilians more valuable with possibility to save them without stun. Beware, every death of civilians affect a morale and unconscious state of civilian is equivalent to bleeding to death."
+  STR_BATTLEEXTENEDCIVILIANS: "Extend civilians behaviour"
   STR_OPENXCOM: "OpenXcom"
   STR_NEW_GAME: "New Game"
   STR_LOAD_SAVED_GAME: "Load Game"

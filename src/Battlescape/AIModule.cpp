@@ -217,7 +217,13 @@ void AIModule::think(BattleAction *action)
 	}
 
 	setupAttack();
-	setupPatrol();
+	
+	// enabled "Extend civilians behaviour" by Xtendo-com. Civilians don't use patrol mode anymore (don't walk around the map).
+	if (Options::battleExtenedCivilians && _unit->getOriginalFaction() != FACTION_NEUTRAL) 
+		setupPatrol();
+	else if (!Options::battleExtenedCivilians)
+		setupPatrol();
+	//---
 
 	if (_psiAction->type != BA_NONE && !_didPsi)
 	{
