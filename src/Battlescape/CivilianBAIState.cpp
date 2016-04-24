@@ -143,8 +143,21 @@ void CivilianBAIState::think(BattleAction *action)
 	}
 
 	setupPatrol();
-
+	
 	bool evaluate = false;
+	
+	// enabled "Extend civilians behaviour" by Xtendo-com. Re-evaluate always to escape mode
+	if (Options::battleExtenedCivilians) 
+		{
+		evaluate = true;
+		}
+	
+	// enabled "Extend civilians behaviour" by Xtendo-com. Visible enemies decreases a morale of AI civilian at start of civilian's turn
+	if (Options::battleExtenedCivilians && _visibleEnemies) 
+		{
+		_unit->moraleChange(-RNG::generate(15,30)*_visibleEnemies);
+		}
+	
 	if (_AIMode == AI_ESCAPE)
 	{
 		if (!_spottingEnemies)
@@ -294,8 +307,14 @@ void CivilianBAIState::setupEscape()
 	const int BASE_SYSTEMATIC_SUCCESS = 100;
 	const int BASE_DESPERATE_SUCCESS = 110;
 	const int FAST_PASS_THRESHOLD = 100; // a score that's good enough to quit the while loop early; it's subjective, hand-tuned and may need tweaking
-
+	
 	int tu = _unit->getTimeUnits() / 2;
+	
+	// enabled "Extend civilians behaviour" by Xtendo-com. Spend all TU in escape mode
+	if (Options::battleExtenedCivilians) 
+		{
+		tu = _unit->getTimeUnits();
+		}
 
 	std::vector<int> reachable = _save->getPathfinding()->findReachable(_unit, tu);
 	std::vector<Position> randomTileSearch = _save->getTileSearch();
@@ -356,9 +375,16 @@ void CivilianBAIState::setupEscape()
 				_escapeAction->target.z = _unit->getPosition().z;
 			}
 		}
-
-		tries += 10; // civilians shouldn't have any tactical sense anyway so save some CPU cycles here
-
+		
+		if (Options::battleExtenedCivilians) // enabled "Extend civilians behaviour" by Xtendo-com
+		{
+			tries += 1; // Re-evaluate more times for better escape solution path
+		}
+		else // disabled "Extend civilians behaviour" by Xtendo-com
+		{
+			tries += 10; // civilians shouldn't have any tactical sense anyway so save some CPU cycles here
+		}
+		
 		// THINK, DAMN YOU
 		tile = _save->getTile(_escapeAction->target);
 		int distanceFromTarget = _aggroTarget ? _save->getTileEngine()->distance(_aggroTarget->getPosition(), _escapeAction->target) : 0;
@@ -586,7 +612,15 @@ void CivilianBAIState::evaluateAIMode()
 	int decision = 1 + RNG::generate(0, patrolOdds + escapeOdds);
 	if (decision > escapeOdds)
 	{
-		_AIMode = AI_PATROL;
+		// enabled "Extend civilians behaviour by Xtendo-com". Re-evaluate always to escape mode
+		if (Options::battleExtenedCivilians) 
+			{
+			_AIMode = AI_ESCAPE;
+			}
+		else // disabled "Extend civilians behaviour" by Xtendo-com
+			{
+			_AIMode = AI_PATROL;
+			}		
 	}
 	else
 	{

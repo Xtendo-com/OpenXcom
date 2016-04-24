@@ -1,4 +1,6 @@
 en-US:
+  STR_BATTLEEXTENEDCIVILIANS_DESC: "Civilians always hiding from aliens when they do not panic. Dead civilian affects a morale for every side. You save civilians when aborting mission. You can manually control civilian when you nearby."
+  STR_BATTLEEXTENEDCIVILIANS: "Extend civilians behaviour"
   STR_OPENXCOM: "OpenXcom"
   STR_NEW_GAME: "New Game"
   STR_LOAD_SAVED_GAME: "Load Game"

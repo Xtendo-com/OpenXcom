@@ -891,6 +891,8 @@ void SavedBattleGame::endTurn()
 			(*i)->setVisible(false);
 		}
 	}
+	
+  // enabled "Extend civilians behaviour" by Xtendo-com
   // Manual control of civilians by yrizoud
   for (std::vector<BattleUnit*>::iterator i = getUnits()->begin(); i != getUnits()->end(); ++i)
   { //find civilian from array of units
@@ -902,13 +904,15 @@ void SavedBattleGame::endTurn()
 	
   	for (std::vector<BattleUnit*>::const_iterator j = getUnits()->begin(); j != getUnits()->end(); ++j)
   	{//find x-com operative from array of units
-  		if ((*j)->isOut() || (*j)->getFaction() != FACTION_PLAYER || (*j)->getOriginalFaction() != FACTION_PLAYER)
+  		if ( (*j)->isOut() || (*j)->getFaction() != FACTION_PLAYER || (*j)->getOriginalFaction() != FACTION_PLAYER )
   		  continue; //skip unit if not x-com operative
+		if ( ((*j)->getStatus() == STATUS_BERSERK || (*j)->getStatus() == STATUS_PANICKING) && (*j)->getTimeUnits()==0)
+		  continue; //skip if x-com operative panicked in that turn
 			Position target = (*j)->getPosition(); //get X,Y,Z coordinats of x-com operative
 
 		  //check for distance from x-com operative to civilian, but do not care about obstacles like walls
-		  const int horiz_dist = 8; //X and Y distance
-		  const int vert_dist =3;   //Z distance
+		  const int horiz_dist = 5; //X and Y distance
+		  const int vert_dist =2;   //Z distance
 			if (target.x >= origin.x - horiz_dist && target.x <= origin.x + horiz_dist
 			&& target.y >= origin.y - horiz_dist && target.y <= origin.y + horiz_dist
 			&& target.z >= origin.z - vert_dist && target.z <= origin.z + vert_dist)

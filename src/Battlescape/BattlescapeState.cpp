@@ -914,23 +914,48 @@ void BattlescapeState::btnInventoryClick(Action *)
 				(*i)->prepareNewTurn();
 		updateSoldierInfo();
 	}
-	if (playableUnitSelected()
-		&& (_save->getSelectedUnit()->getArmor()->getSize() == 1 || _save->getDebugMode())
-		&& (_save->getSelectedUnit()->getOriginalFaction() == FACTION_PLAYER ||
-			_save->getSelectedUnit()->getRankString() != "STR_LIVE_TERRORIST"))
+	if (!Options::battleExtenedCivilians) //disabled "Extend civilians behaviour" by Xtendo-com
 	{
-		// clean up the waypoints
-		if (_battleGame->getCurrentAction()->type == BA_LAUNCH)
+		if (playableUnitSelected()
+			&& (_save->getSelectedUnit()->getArmor()->getSize() == 1 || _save->getDebugMode())
+			&& (_save->getSelectedUnit()->getOriginalFaction() == FACTION_PLAYER ||
+				_save->getSelectedUnit()->getRankString() != "STR_LIVE_TERRORIST"))
 		{
-			_battleGame->getCurrentAction()->waypoints.clear();
-			_battleGame->getMap()->getWaypoints()->clear();
-			showLaunchButton(false);
+			// clean up the waypoints
+			if (_battleGame->getCurrentAction()->type == BA_LAUNCH)
+			{
+				_battleGame->getCurrentAction()->waypoints.clear();
+				_battleGame->getMap()->getWaypoints()->clear();
+				showLaunchButton(false);
+			}
+
+			_battleGame->getPathfinding()->removePreview();
+			_battleGame->cancelCurrentAction(true);
+
+			_game->pushState(new InventoryState(!_save->getDebugMode(), this));
 		}
+	}
+	else //enabled "Extend civilians behaviour" by Xtendo-com. Don't open inventory from battlescape if civilian selected
+	{//just copyied and pasted the code upward with additonal check for civilian. FIX ME. Make the code more elegant without COPY/PASTE.
+		if (playableUnitSelected()
+			&& (_save->getSelectedUnit()->getArmor()->getSize() == 1 || _save->getDebugMode())
+			&& (_save->getSelectedUnit()->getOriginalFaction() == FACTION_PLAYER ||
+				_save->getSelectedUnit()->getRankString() != "STR_LIVE_TERRORIST")
+		    && _save->getSelectedUnit()->getOriginalFaction() != FACTION_NEUTRAL )
+		{
+			// clean up the waypoints
+			if (_battleGame->getCurrentAction()->type == BA_LAUNCH)
+			{
+				_battleGame->getCurrentAction()->waypoints.clear();
+				_battleGame->getMap()->getWaypoints()->clear();
+				showLaunchButton(false);
+			}
 
-		_battleGame->getPathfinding()->removePreview();
-		_battleGame->cancelCurrentAction(true);
+			_battleGame->getPathfinding()->removePreview();
+			_battleGame->cancelCurrentAction(true);
 
-		_game->pushState(new InventoryState(!_save->getDebugMode(), this));
+			_game->pushState(new InventoryState(!_save->getDebugMode(), this));
+		}		
 	}
 }
 

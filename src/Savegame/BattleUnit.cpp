@@ -1639,8 +1639,13 @@ void BattleUnit::prepareNewTurn(bool fullProcess)
 	if (_faction != _originalFaction)
 	{
 		_faction = _originalFaction;
-		// Manual control of civilians by yrizoud
-		if (_originalFaction!=FACTION_NEUTRAL) return;
+		// Enabled "Extend civilians behaviour" by Xtendo-com. Don't exit from prepare turn operation for controled by player civilians
+		if (Options::battleExtenedCivilians) 
+		{
+			if (_originalFaction!=FACTION_NEUTRAL) return;
+		}
+		// Disabled "Extend civilians behaviour" by Xtendo-com.
+		else return;
 	}
 
 	_unitsSpottedThisTurn.clear();
@@ -1689,6 +1694,7 @@ void BattleUnit::prepareNewTurn(bool fullProcess)
 		{
 			int type = RNG::generate(0,100);
 			_status = (type<=33?STATUS_BERSERK:STATUS_PANICKING); // 33% chance of berserk, panic can mean freeze or flee, but that is determined later
+			if ( Options::battleExtenedCivilians && _originalFaction==FACTION_NEUTRAL) _status = STATUS_PANICKING; // enabled "Extend civilians behaviour" by Xtendo-com. Civilians always panicking in that case
 		}
 		else
 		{
@@ -2930,6 +2936,7 @@ bool BattleUnit::isSelectable(UnitFaction faction, bool checkReselect, bool chec
  */
 bool BattleUnit::hasInventory() const
 {
+	if (Options::battleExtenedCivilians && _originalFaction == FACTION_NEUTRAL) return false;  // enabled "Extend civilians behaviour" by Xtendo-com. Hardcodes that civilians don't has inventory
 	return (_armor->hasInventory());
 }
 
