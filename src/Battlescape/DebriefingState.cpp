@@ -64,6 +64,8 @@
 #include "../Mod/RuleInterface.h"
 #include "../Savegame/MissionStatistics.h"
 #include "../Savegame/BattleUnitStatistics.h"
+#include "../Engine/Logger.h"
+#include "../Engine/RNG.h"
 
 namespace OpenXcom
 {
@@ -1171,7 +1173,19 @@ void DebriefingState::prepareDebriefing()
 	// calculate the clips for each type based on the recovered rounds.
 	for (std::map<RuleItem*, int>::const_iterator i = _rounds.begin(); i != _rounds.end(); ++i)
 	{
-		int total_clips = i->second / i->first->getClipSize();
+		int total_clips = 0;
+		if (Options::alternateClipConsumption) //enabled "Alternate clip consumption" by Arthanor
+		{
+			Log(LOG_VERBOSE) << "Total " << i->first->getName() << " by available bullets: " << i->second / i->first->getClipSize() << " (bullets: " << i->second << ") (clipsize: " << i->first->getClipSize() << ")";
+			int tempclip = RNG::generate(0, ( i->first->getClipSize() - 1 ) );
+			total_clips = ( i->second + tempclip ) / i->first->getClipSize();
+			Log(LOG_VERBOSE) << "Total " << i->first->getName() << " by available bullets and chance: " << total_clips << " (bullets=" << i->second << ") (additional bullets=" << tempclip << ") (clipsize:=" << i->first->getClipSize() << ")"; 
+		}
+		else //disabled "Alternate clip consumption" by Arthanor
+		{
+			total_clips = i->second / i->first->getClipSize();
+			Log(LOG_VERBOSE) << "Total " << i->first->getName() << " by available bullets: " << i->second / i->first->getClipSize() << " (bullets: " << i->second << ") (clipsize: " << i->first->getClipSize() << ")";
+		}
 		if (total_clips > 0)
 			base->getStorageItems()->addItem(i->first->getType(), total_clips);
 	}
