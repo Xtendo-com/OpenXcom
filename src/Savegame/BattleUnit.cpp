@@ -1179,7 +1179,7 @@ int BattleUnit::damage(const Position &relative, int power, ItemDamageType type,
 				_health -= power;
 				if (_health <= 0)
 				{
-					if (_faction==FACTION_PLAYER) //Log mortal hits only for player side
+					if (_originalFaction==FACTION_PLAYER) //Log mortal hits only for x-com operatives
 					{
 						Log(LOG_VERBOSE) << "chance to survive a mortal hit was : " 
 									 << "health " << (_stats.health+_health)/3 << "% + "
@@ -1192,7 +1192,7 @@ int BattleUnit::damage(const Position &relative, int power, ItemDamageType type,
 									 (_stats.health+_health)/3  // take 33% from (MAX HP - overkill HP)
 									 + _morale/3 				// take 33% from current morale
 									 +_stats.bravery/2) && 		// take 50% from current bravery
-					   (_faction==FACTION_PLAYER) && //Applied only to x-com operatives
+					   (_originalFaction==FACTION_PLAYER) && //Applied only to x-com operatives
 					   (type!=DT_HE) && //X-com operative can't survive from explosion
 					   (_armor->getSize() == 1)) //don't apply this rule to tanks
 						  {
