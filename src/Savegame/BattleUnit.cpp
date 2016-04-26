@@ -37,6 +37,7 @@
 #include "SavedBattleGame.h"
 #include "BattleUnitStatistics.h"
 #include "../fmath.h"
+#include "../Engine/Logger.h"
 
 namespace OpenXcom
 {
@@ -1670,9 +1671,21 @@ void BattleUnit::prepareNewTurn(bool fullProcess)
 		_health -= _armor->getDamageModifier(DT_IN) * RNG::generate(Mod::FIRE_DAMAGE_RANGE[0], Mod::FIRE_DAMAGE_RANGE[1]);
 		_fire--;
 	}
+	
+	if (Options::battleExtenedCivilians) // Enabled "Extend civilians behaviour" by Xtendo-com.
+		{//Unconscious civilian dies like bleeding to death
+			if (_originalFaction==FACTION_NEUTRAL && _status==STATUS_UNCONSCIOUS) 
+			{
+				_health -= RNG::generate(3,9); // Randomly damages health when in UNCONSCIOUS state
+				_stunlevel=_health+RNG::generate(1,9); //Random stun level, May require 1,2 or 3 stimulators
+				Log(LOG_VERBOSE) << "Civilian dies in STATUS_UNCONSCIOUS, health after bleeding: " << _health << " (stun level: " << _stunlevel << ")";
+			}
+		
+		}
 
 	if (_health < 0)
 		_health = 0;
+	
 
 	// if unit is dead, AI state should be gone
 	if (_health == 0 && _currentAIState)
@@ -2492,6 +2505,7 @@ int BattleUnit::getMoveSound() const
  */
 bool BattleUnit::isWoundable() const
 {
+	if (Options::battleExtenedCivilians && _originalFaction == FACTION_NEUTRAL) return true; // enabled "Extend civilians behaviour" by Xtendo-com. Civilians also affected by fatal wounds
 	return (_type=="SOLDIER" || (Options::alienBleeding && _faction != FACTION_PLAYER && _armor->getSize() == 1));
 }
 

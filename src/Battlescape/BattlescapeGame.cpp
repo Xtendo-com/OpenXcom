@@ -719,7 +719,7 @@ void BattlescapeGame::checkForCasualties(BattleItem *murderweapon, BattleUnit *m
 							}
 							
 							// enabled "Extend civilians behaviour" by Xtendo-com.
-							else if (victim->getOriginalFaction()!=FACTION_PLAYER && (*i)->getOriginalFaction() != FACTION_NEUTRAL && Options::battleExtenedCivilians)
+							else if (Options::battleExtenedCivilians && victim->getOriginalFaction()!=FACTION_PLAYER && (*i)->getOriginalFaction() != FACTION_NEUTRAL)
 							{//Don't give a morale bonus for civilian after death of x-com operative
 								(*i)->moraleChange(10 * winnerMod / 100);
 							}
@@ -734,15 +734,15 @@ void BattlescapeGame::checkForCasualties(BattleItem *murderweapon, BattleUnit *m
 							if (Options::battleExtenedCivilians && victim->getOriginalFaction()==FACTION_HOSTILE && (*i)->getOriginalFaction()==FACTION_NEUTRAL && (*i)->getFaction()==FACTION_PLAYER)
 							{//Died alien, modify morale of civilian under player control
 								(*i)->moraleChange(10 * winnerMod / 100);
-								Log(LOG_INFO) << "Killed alien. Morale change for x-com civilian: " << 10 * winnerMod / 100 << " (winnerMod: " << winnerMod << ")";
+								Log(LOG_VERBOSE) << "Killed alien. Morale change for x-com civilian: " << 10 * winnerMod / 100 << " (winnerMod: " << winnerMod << ")";
 							}
 
 							// enabled "Extend civilians behaviour" by Xtendo-com. Handle morale after death of alien for civilans not under player control.
 							else if (Options::battleExtenedCivilians && victim->getOriginalFaction()==FACTION_HOSTILE && (*i)->getOriginalFaction()==FACTION_NEUTRAL && (*i)->getFaction()==FACTION_NEUTRAL)
 							{//Died alien, modify morale of civilian not under player control
-								int tempi = RNG::generate(1,10);
+								int tempi = RNG::generate(5,20);
 								(*i)->moraleChange(tempi);
-								Log(LOG_INFO) << "Killed alien. Morale change for civilan: " << tempi;
+								Log(LOG_VERBOSE) << "Killed alien. Morale change for civilan: " << tempi;
 							}	
 							
 							// enabled "Extend civilians behaviour" by Xtendo-com. Handle morale after death of x-com operative for civilans under player control.
@@ -750,7 +750,7 @@ void BattlescapeGame::checkForCasualties(BattleItem *murderweapon, BattleUnit *m
 							{//Died x-com operative, modify morale of civilian under player control
 								int bravery = (110 - 0) / 10;  //fixme. Bravery is hardcoded for civilian. 
 								(*i)->moraleChange(-(modifier * 200 * bravery / loserMod / 100));
-								Log(LOG_INFO) << "Killed X-COM operative. Morale change for x-com civilian: " << -(modifier * 200 * bravery / loserMod / 100) << " (modifier: " << modifier << " bravery: " << bravery << " losermod: " << loserMod << ")";
+								Log(LOG_VERBOSE) << "Killed X-COM operative. Morale change for x-com civilian: " << -(modifier * 200 * bravery / loserMod / 100) << " (modifier: " << modifier << " bravery: " << bravery << " losermod: " << loserMod << ")";
 							}
 
 							// enabled "Extend civilians behaviour" by Xtendo-com. Handle morale after death of x-com operative for civilans not under player control.
@@ -759,9 +759,9 @@ void BattlescapeGame::checkForCasualties(BattleItem *murderweapon, BattleUnit *m
 								//int bravery = (110 - 0) / 10;  //fixme. Bravery is hardcoded for civilian. 
 								//(*i)->moraleChange(-(modifier * 200 * bravery / loserMod / 100));
 								//Log(LOG_INFO) << "Killed X-COM operative. Morale change for civilan: " << -(modifier * 200 * bravery / loserMod / 100) << " (modifier: " << modifier << " bravery: " << bravery << " losermod: " << loserMod << ")";
-								int tempi = RNG::generate(30,60);
+								int tempi = RNG::generate(25,50);
 								(*i)->moraleChange(-tempi);
-								Log(LOG_INFO) << "Killed X-COM operative. Morale change for civilan: " << -tempi;
+								Log(LOG_VERBOSE) << "Killed X-COM operative. Morale change for civilan: " << -tempi;
 							}
 						}
 					}
@@ -781,7 +781,7 @@ void BattlescapeGame::checkForCasualties(BattleItem *murderweapon, BattleUnit *m
 							{
 								int bravery = (110 - (*i)->getBaseStats()->bravery) / 10;
 								(*i)->moraleChange(-(modifier * 200 * bravery / loserModXCOM / 100));
-								Log(LOG_INFO) << "Killed civilian. Morale change for x-com operative: " << -(modifier * 200 * bravery / loserModXCOM / 100) << " (modifier: " << modifier << " bravery: " << bravery << " losermod: " << loserModXCOM << ")";
+								Log(LOG_VERBOSE) << "Killed civilian. Morale change for x-com operative: " << -(modifier * 200 * bravery / loserModXCOM / 100) << " (modifier: " << modifier << " bravery: " << bravery << " losermod: " << loserModXCOM << ")";
 							}
 							else if ((*i)->getOriginalFaction() == FACTION_NEUTRAL && (*i)->getFaction() == FACTION_NEUTRAL) // Killed civilian decreases morale of civilians
 							{
@@ -789,22 +789,22 @@ void BattlescapeGame::checkForCasualties(BattleItem *murderweapon, BattleUnit *m
 								//int bravery = (110 - 0) / 10; //fixme. Bravery is hardcoded for civilian.
 								//(*i)->moraleChange(-(modifier * 200 * bravery / loserModCivil/ 100));
 								//Log(LOG_INFO) << "Killed civilian. Morale change for civilian: " << -(modifier * 200 * bravery / loserModCivil / 100) << " (modifier: " << modifier << " bravery: " << bravery << " losermod: " << loserModCivil << ")";
-								int tempi = RNG::generate(30,60);
+								int tempi = RNG::generate(25,50);
 								(*i)->moraleChange(-tempi);
-								Log(LOG_INFO) << "Killed civilian. Morale change for civilan: " << -tempi;
+								Log(LOG_VERBOSE) << "Killed civilian. Morale change for civilan: " << -tempi;
 							}
 							else if ((*i)->getOriginalFaction() == FACTION_NEUTRAL && (*i)->getFaction() == FACTION_PLAYER) // Killed civilian decreases morale of controlled by x-com operatives civilians
 								{
 								//int bravery = (110 - (*i)->getBaseStats()->bravery) / 10 //civilian have 80 bravery stats... More bravery than x-com operatives...
 								int bravery = (110 - 0) / 10;  //fixme. Bravery is hardcoded for civilian. 
 								(*i)->moraleChange(-(modifier * 200 * bravery / loserModXCOM / 100));
-								Log(LOG_INFO) << "Killed civilian. Morale change for x-com civilian: " << -(modifier * 200 * bravery / loserModXCOM / 100) << " (modifier: " << modifier << " bravery: " << bravery << " losermod: " << loserModXCOM << ")";
+								Log(LOG_VERBOSE) << "Killed civilian. Morale change for x-com civilian: " << -(modifier * 200 * bravery / loserModXCOM / 100) << " (modifier: " << modifier << " bravery: " << bravery << " losermod: " << loserModXCOM << ")";
 								}
 							// the winning squad all get a morale increase
 							else if ((*i)->getOriginalFaction() == FACTION_HOSTILE) // Killed civilian increases a morale of aliens
 							{
 								(*i)->moraleChange(10 * winnerMod / 100);
-								Log(LOG_INFO) << "Killed civilian. Morale change for aliens " << 10 * winnerMod / 100 << " (winnerMod: " << winnerMod << ")";
+								Log(LOG_VERBOSE) << "Killed civilian. Morale change for aliens " << 10 * winnerMod / 100 << " (winnerMod: " << winnerMod << ")";
 							}
 						}
 					}
