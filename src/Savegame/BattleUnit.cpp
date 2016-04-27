@@ -1610,7 +1610,17 @@ int BattleUnit::getFatalWounds() const
 		sum += _fatalWounds[i];
 	return sum;
 }
-
+	
+/** "Extend civilians behaviour" by Xtendo-com.
+ * Check for pulse
+ * @return false if unit has no pulse
+ */
+bool BattleUnit::getPulse() const
+{
+	if (!Options::battleExtenedCivilians) return true; //Disable pulse feature if not enabled in advanced options
+	if (_originalFaction==FACTION_NEUTRAL && _status==STATUS_UNCONSCIOUS) return false;
+	return true;
+}
 
 /**
  * Little formula to calculate reaction score.
@@ -1672,20 +1682,14 @@ void BattleUnit::prepareNewTurn(bool fullProcess)
 		_fire--;
 	}
 	
-	if (Options::battleExtenedCivilians) // Enabled "Extend civilians behaviour" by Xtendo-com.
-		{//Unconscious civilian dies like bleeding to death
-			if (_originalFaction==FACTION_NEUTRAL && _status==STATUS_UNCONSCIOUS) 
-			{
-				_health -= RNG::generate(3,9); // Randomly damages health when in UNCONSCIOUS state
-				_stunlevel=_health+RNG::generate(1,9); //Random stun level, May require 1,2 or 3 stimulators
-				Log(LOG_VERBOSE) << "Civilian dies in STATUS_UNCONSCIOUS, health after bleeding: " << _health << " (stun level: " << _stunlevel << ")";
-			}
-		
-		}
+	if (!getPulse()) // Enabled "Extend civilians behaviour" by Xtendo-com., see BattleUnit::getPulse() function
+	{//Unconscious civilian dies like bleeding to death except
+		_health -= RNG::generate(1,9); // Randomly damages health when in UNCONSCIOUS state
+		_stunlevel=_health+RNG::generate(1,9); //Random stun level, May require 1,2 or 3 stimulators
+	}
 
 	if (_health < 0)
 		_health = 0;
-	
 
 	// if unit is dead, AI state should be gone
 	if (_health == 0 && _currentAIState)
