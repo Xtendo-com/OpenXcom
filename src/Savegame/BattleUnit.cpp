@@ -1609,6 +1609,17 @@ int BattleUnit::getFatalWounds() const
 		sum += _fatalWounds[i];
 	return sum;
 }
+	
+/** "No pulse in unconscious state" by Xtendo-com.
+ * Check for pulse
+ * @return false if unit has no pulse
+ */
+bool BattleUnit::getPulse() const
+{
+	if (!Options::battleUnconsciousNoPulse) return true; //Disable pulse feature if not enabled in advanced options
+	if (_originalFaction!=FACTION_HOSTILE && _status==STATUS_UNCONSCIOUS) return false;
+	return true;
+}
 
 
 /**
@@ -1663,6 +1674,12 @@ void BattleUnit::prepareNewTurn(bool fullProcess)
 	{
 		_health -= _armor->getDamageModifier(DT_IN) * RNG::generate(Mod::FIRE_DAMAGE_RANGE[0], Mod::FIRE_DAMAGE_RANGE[1]);
 		_fire--;
+	}
+	
+	if (!getPulse()) // Enabled "No pulse in unconscious state" by Xtendo-com, see BattleUnit::getPulse() function
+	{//Unconscious unit dies like bleeding to death except for alien
+		_health -= RNG::generate(1,9); // Randomly damages health when in UNCONSCIOUS state
+		_stunlevel=_health+RNG::generate(1,9); //Random stun level, May require 1,2 or 3 stimulators
 	}
 
 	if (_health < 0)
