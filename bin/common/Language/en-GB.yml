@@ -3,6 +3,8 @@ en-GB:
   STR_BATTLEADVANCEDSCANNER_DESC: "Locations of enemies, uncovered by scanner, will be marked as red boxes on the battlefield."
   STR_BATTLEALIENSHOOTBLINDLY: "Aliens can shoot blindly"
   STR_BATTLEALIENSHOOTBLINDLY_DESC: "Aliens can shoot to spotted x-com operatives without visual contact."
+  STR_ALTERNATECLIPCONSUMPTION: "Alternate clip consumption"
+  STR_ALTERNATECLIPCONSUMPTION_DESC: "Reduce ineffictevie calculation of clip consumption after statistic screen if clip is almost full. If that option disabled, clip counts as consumed if there are not enough bullets to fill clip completly"
   STR_OPENXCOM: "OpenXcom"
   STR_NEW_GAME: "New Game"
   STR_LOAD_SAVED_GAME: "Load Game"

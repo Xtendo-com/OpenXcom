@@ -200,6 +200,7 @@ void create()
 	_info.push_back(OptionInfo("alienBleeding", &alienBleeding, false, "STR_ALIENBLEEDING", "STR_BATTLESCAPE"));
 	_info.push_back(OptionInfo("battleAdvancedScanner", &battleAdvancedScanner, false, "STR_BATTLEADVANCEDSCANNER", "STR_BATTLESCAPE")); //advanced scanner by redv
 	_info.push_back(OptionInfo("battleAlienShootBlindly", &battleAlienShootBlindly, false, "STR_BATTLEALIENSHOOTBLINDLY", "STR_BATTLESCAPE"));
+	_info.push_back(OptionInfo("alternateClipConsumption", &alternateClipConsumption, false, "STR_ALTERNATECLIPCONSUMPTION", "STR_BATTLESCAPE")); //"Alternate clip consumption" by Arthanor
 	
 	// controls
 	_info.push_back(OptionInfo("keyOk", &keyOk, SDLK_RETURN, "STR_OK", "STR_GENERAL"));
