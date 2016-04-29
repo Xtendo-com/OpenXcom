@@ -199,6 +199,7 @@ void create()
 	_info.push_back(OptionInfo("noAlienPanicMessages", &noAlienPanicMessages, false, "STR_NOALIENPANICMESSAGES", "STR_BATTLESCAPE"));
 	_info.push_back(OptionInfo("alienBleeding", &alienBleeding, false, "STR_ALIENBLEEDING", "STR_BATTLESCAPE"));
 	_info.push_back(OptionInfo("battleAdvancedScanner", &battleAdvancedScanner, false, "STR_BATTLEADVANCEDSCANNER", "STR_BATTLESCAPE")); //advanced scanner by redv
+	_info.push_back(OptionInfo("battleAlienShootBlindly", &battleAlienShootBlindly, false, "STR_BATTLEALIENSHOOTBLINDLY", "STR_BATTLESCAPE"));
 	
 	// controls
 	_info.push_back(OptionInfo("keyOk", &keyOk, SDLK_RETURN, "STR_OK", "STR_GENERAL"));
