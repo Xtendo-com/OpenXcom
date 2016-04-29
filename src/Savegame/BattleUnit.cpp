@@ -1648,13 +1648,14 @@ int BattleUnit::getFatalWounds() const
 }
 	
 /** "Extend civilians behaviour" by Xtendo-com.
+/** "No pulse in unconscious state" by Xtendo-com.
  * Check for pulse
  * @return false if unit has no pulse
  */
 bool BattleUnit::getPulse() const
 {
-	if (!Options::battleExtenedCivilians) return true; //Disable pulse feature if not enabled in advanced options
-	if (_originalFaction==FACTION_NEUTRAL && _status==STATUS_UNCONSCIOUS) return false;
+	if (Options::battleUnconsciousNoPulse && _originalFaction!=FACTION_HOSTILE && _status==STATUS_UNCONSCIOUS) return false;
+	if (Options::battleExtenedCivilians && _originalFaction==FACTION_NEUTRAL && _status==STATUS_UNCONSCIOUS) return false;
 	return true;
 }
 
@@ -1719,7 +1720,7 @@ void BattleUnit::prepareNewTurn(bool fullProcess)
 	}
 	
 	if (!getPulse()) // Enabled "Extend civilians behaviour" by Xtendo-com., see BattleUnit::getPulse() function
-	{//Unconscious civilian dies like bleeding to death except
+	{//Unconscious unit dies like bleeding to death
 		_health -= RNG::generate(1,9); // Randomly damages health when in UNCONSCIOUS state
 		_stunlevel=_health+RNG::generate(1,9); //Random stun level, May require 1,2 or 3 stimulators
 	}

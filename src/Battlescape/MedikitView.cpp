@@ -79,7 +79,7 @@ void MedikitView::draw()
 		int wound = _unit->getFatalWound(i);
 		Surface * surface = set->getFrame (i);
 		int baseColor = wound ? red : green;
-		if (!_unit->getPulse()) baseColor=red; // Enabled "Extend civilians behaviour" by Xtendo-com (see BattleUnit::getPulse()). Show always red state when people in UNCONSCIOUS state since he dying in that state.
+		if (!_unit->getPulse()) baseColor=red; // Enabled "Extend civilians behaviour" or "No pulse in unconscious state" by Xtendo-com (see BattleUnit::getPulse()). Show always red state when people in UNCONSCIOUS state since he dying in that state.
 		surface->blitNShade(this, Surface::getX(), Surface::getY(), 0, false, baseColor);
 	}
 	this->unlock();
@@ -91,6 +91,7 @@ void MedikitView::draw()
 	}
 	
 	// Enabled "Extend civilians behaviour" by Xtendo-com (see BattleUnit::getPulse()).
+	// or Enabled "No pulse in unconscious state" by Xtendo-com (see BattleUnit::getPulse()).
 	if (!_unit->getPulse())
 	{//Show "NO PULSE on the display of medikit
 		ss << " NO PULSE";
@@ -98,6 +99,7 @@ void MedikitView::draw()
 	}
 	else
 	{// Disabled "Extend civilians behaviour" by Xtendo-com.
+	// or Disabled "No pulse in unconscious state" by Xtendo-com.
 		ss << _game->getLanguage()->getString(PARTS_STRING[_selectedPart]);
 		ss1 << fatal_wound;
 		_partTxt->setText(ss.str());

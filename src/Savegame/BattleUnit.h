@@ -266,7 +266,7 @@ public:
 	int getMaxArmor(UnitSide side) const;
 	/// Get total number of fatal wounds.
 	int getFatalWounds() const;
-	/// Check for pulse. Used in "Extend civilians behaviour" by Xtendo-com.
+	/// Check for pulse. Used in "No pulse in unconscious state" and "Extend civilians behaviour" by Xtendo-com.
 	bool getPulse() const;
 	/// Get the current reaction score.
 	double getReactionScore();

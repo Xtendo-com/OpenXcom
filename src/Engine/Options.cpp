@@ -203,6 +203,7 @@ void create()
 	_info.push_back(OptionInfo("alternateClipConsumption", &alternateClipConsumption, false, "STR_ALTERNATECLIPCONSUMPTION", "STR_BATTLESCAPE")); //"Alternate clip consumption" by Arthanor
 	_info.push_back(OptionInfo("battleExtenedCivilians", &battleExtenedCivilians, false, "STR_BATTLEEXTENEDCIVILIANS", "STR_BATTLESCAPE")); //Extend civilians behaviour by Xtendo-com.
 	_info.push_back(OptionInfo("battleIncreaseSurvivability", &battleIncreaseSurvivability, false, "STR_BATTLEINCREASESURVIVABILITY", "STR_BATTLESCAPE")); //"Increase survivability of x-com soldiers" by Xtendo-com
+	_info.push_back(OptionInfo("battleUnconsciousNoPulse", &battleUnconsciousNoPulse, false, "STR_BATTLEUNCONSCIOUSNOPULSE", "STR_BATTLESCAPE")); //"No pulse in unconscious state" by Xtendo-com.
 	
 	// controls
 	_info.push_back(OptionInfo("keyOk", &keyOk, SDLK_RETURN, "STR_OK", "STR_GENERAL"));

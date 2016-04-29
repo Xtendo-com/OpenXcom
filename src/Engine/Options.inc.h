@@ -37,7 +37,8 @@ OPT bool traceAI, sneakyAI, battleInstantGrenade, battleNotifyDeath, battleToolt
 	battleAlienShootBlindly, //alien shoot blindly by psyHoTik
 	alternateClipConsumption, //"Alternate clip consumption" by Arthanor
 	battleExtenedCivilians, //Extend civilians behaviour by Xtendo-com;
-	battleIncreaseSurvivability //"Increase survivability of x-com soldiers" by Xtendo-com
+	battleIncreaseSurvivability, //"Increase survivability of x-com soldiers" by Xtendo-com
+	battleUnconsciousNoPulse //"No pulse in unconscious state" by Xtendo-com.
 	;
 OPT SDLKey keyBattleLeft, keyBattleRight, keyBattleUp, keyBattleDown, keyBattleLevelUp, keyBattleLevelDown, keyBattleCenterUnit, keyBattlePrevUnit, keyBattleNextUnit, keyBattleDeselectUnit,
 	keyBattleUseLeftHand, keyBattleUseRightHand, keyBattleInventory, keyBattleMap, keyBattleOptions, keyBattleEndTurn, keyBattleAbort, keyBattleStats, keyBattleKneel,

@@ -9,6 +9,8 @@ en-GB:
   STR_BATTLEEXTENEDCIVILIANS: "Extend civilians behaviour"
   STR_BATTLEINCREASESURVIVABILITY: "Increase survivability of x-com soldiers"
   STR_BATTLEINCREASESURVIVABILITY_DESC: "Healthly soldier with high morale and bravery has a chance to lose consciousness instead of dying after a mortal hit. Soldiers with high bravery are more likely to survive a mortal hit."
+  STR_BATTLEUNCONSCIOUSNOPULSE: "No pulse in unconscious state"
+  STR_BATTLEUNCONSCIOUSNOPULSE_DESC: "Human lose pulse in unconscious state and lose HP to death. You need to use stimulators from medikit in that case."
   STR_OPENXCOM: "OpenXcom"
   STR_NEW_GAME: "New Game"
   STR_LOAD_SAVED_GAME: "Load Game"
