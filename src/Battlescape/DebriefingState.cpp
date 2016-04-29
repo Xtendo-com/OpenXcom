@@ -1035,14 +1035,38 @@ void DebriefingState::prepareDebriefing()
 			}
 			else if (oldFaction == FACTION_NEUTRAL)
 			{
-				// if mission fails, all civilians die
-				if (aborted || playersSurvived == 0)
+				
+				// enabled "Extend civilians behaviour" by Xtendo-com. Count saved civilans if you abort mission and civilan is inside of transporter
+				if (Options::battleExtenedCivilians) 
 				{
-					addStat("STR_CIVILIANS_KILLED_BY_ALIENS", 1, -(*j)->getValue());
+					if (playersSurvived == 0)
+					{//If all x-com operatives dies, civilians also dies
+						addStat("STR_CIVILIANS_KILLED_BY_ALIENS", 1, -(*j)->getValue());
+					}
+					else if (aborted && (*j)->isInExitArea() && (*j)->getStatus()!=STATUS_DEAD) 
+					{//if aborted, but civilian inside transporter
+						addStat("STR_CIVILIANS_SAVED", 1, (*j)->getValue());
+					}
+					else if (aborted && !(*j)->isInExitArea())
+					{//if aborted and civilan outside of transporter
+						addStat("STR_CIVILIANS_KILLED_BY_ALIENS", 1, -(*j)->getValue());
+					}
+					else if (!aborted && playersSurvived > 0)
+					{//if mission completed
+						addStat("STR_CIVILIANS_SAVED", 1, (*j)->getValue());
+					}
 				}
 				else
 				{
-					addStat("STR_CIVILIANS_SAVED", 1, (*j)->getValue());
+					// if mission fails, all civilians die
+					if (aborted || playersSurvived == 0)
+					{
+						addStat("STR_CIVILIANS_KILLED_BY_ALIENS", 1, -(*j)->getValue());
+					}
+					else
+					{
+						addStat("STR_CIVILIANS_SAVED", 1, (*j)->getValue());
+					}
 				}
 			}
 		}

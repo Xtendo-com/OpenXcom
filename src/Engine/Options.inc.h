@@ -35,8 +35,9 @@ OPT bool traceAI, sneakyAI, battleInstantGrenade, battleNotifyDeath, battleToolt
 	battleUFOExtenderAccuracy, battleConfirmFireMode, battleSmoothCamera, noAlienPanicMessages, alienBleeding,
 	battleAdvancedScanner, //advanced scanner by redv
 	battleAlienShootBlindly, //alien shoot blindly by psyHoTik
-	alternateClipConsumption //"Alternate clip consumption" by Arthanor
-	;
+	alternateClipConsumption, //"Alternate clip consumption" by Arthanor
+	battleExtenedCivilians //Extend civilians behaviour by Xtendo-com;
+	; 
 OPT SDLKey keyBattleLeft, keyBattleRight, keyBattleUp, keyBattleDown, keyBattleLevelUp, keyBattleLevelDown, keyBattleCenterUnit, keyBattlePrevUnit, keyBattleNextUnit, keyBattleDeselectUnit,
 	keyBattleUseLeftHand, keyBattleUseRightHand, keyBattleInventory, keyBattleMap, keyBattleOptions, keyBattleEndTurn, keyBattleAbort, keyBattleStats, keyBattleKneel,
 	keyBattleReserveKneel, keyBattleReload, keyBattlePersonalLighting, keyBattleReserveNone, keyBattleReserveSnap, keyBattleReserveAimed, keyBattleReserveAuto,

@@ -37,6 +37,7 @@
 #include "SavedBattleGame.h"
 #include "BattleUnitStatistics.h"
 #include "../fmath.h"
+#include "../Engine/Logger.h"
 
 namespace OpenXcom
 {
@@ -1613,7 +1614,17 @@ int BattleUnit::getFatalWounds() const
 		sum += _fatalWounds[i];
 	return sum;
 }
-
+	
+/** "Extend civilians behaviour" by Xtendo-com.
+ * Check for pulse
+ * @return false if unit has no pulse
+ */
+bool BattleUnit::getPulse() const
+{
+	if (!Options::battleExtenedCivilians) return true; //Disable pulse feature if not enabled in advanced options
+	if (_originalFaction==FACTION_NEUTRAL && _status==STATUS_UNCONSCIOUS) return false;
+	return true;
+}
 
 /**
  * Little formula to calculate reaction score.
@@ -1643,7 +1654,13 @@ void BattleUnit::prepareNewTurn(bool fullProcess)
 	if (_faction != _originalFaction)
 	{
 		_faction = _originalFaction;
-		return;
+		// Enabled "Extend civilians behaviour" by Xtendo-com. Don't exit from prepare turn operation for controled by player civilians
+		if (Options::battleExtenedCivilians) 
+		{
+			if (_originalFaction!=FACTION_NEUTRAL) return;
+		}
+		// Disabled "Extend civilians behaviour" by Xtendo-com.
+		else return;
 	}
 
 	_unitsSpottedThisTurn.clear();
@@ -1667,6 +1684,12 @@ void BattleUnit::prepareNewTurn(bool fullProcess)
 	{
 		_health -= _armor->getDamageModifier(DT_IN) * RNG::generate(Mod::FIRE_DAMAGE_RANGE[0], Mod::FIRE_DAMAGE_RANGE[1]);
 		_fire--;
+	}
+	
+	if (!getPulse()) // Enabled "Extend civilians behaviour" by Xtendo-com., see BattleUnit::getPulse() function
+	{//Unconscious civilian dies like bleeding to death except
+		_health -= RNG::generate(1,9); // Randomly damages health when in UNCONSCIOUS state
+		_stunlevel=_health+RNG::generate(1,9); //Random stun level, May require 1,2 or 3 stimulators
 	}
 
 	if (_health < 0)
@@ -1692,6 +1715,7 @@ void BattleUnit::prepareNewTurn(bool fullProcess)
 		{
 			int type = RNG::generate(0,100);
 			_status = (type<=33?STATUS_BERSERK:STATUS_PANICKING); // 33% chance of berserk, panic can mean freeze or flee, but that is determined later
+			if ( Options::battleExtenedCivilians && _originalFaction==FACTION_NEUTRAL) _status = STATUS_PANICKING; // enabled "Extend civilians behaviour" by Xtendo-com. Civilians always panicking in that case
 		}
 		else
 		{
@@ -2489,6 +2513,7 @@ int BattleUnit::getMoveSound() const
  */
 bool BattleUnit::isWoundable() const
 {
+	if (Options::battleExtenedCivilians && _originalFaction == FACTION_NEUTRAL) return true; // enabled "Extend civilians behaviour" by Xtendo-com. Civilians also affected by fatal wounds
 	return (_type=="SOLDIER" || (Options::alienBleeding && _faction != FACTION_PLAYER && _armor->getSize() == 1));
 }
 
@@ -2933,6 +2958,7 @@ bool BattleUnit::isSelectable(UnitFaction faction, bool checkReselect, bool chec
  */
 bool BattleUnit::hasInventory() const
 {
+	if (Options::battleExtenedCivilians && _originalFaction == FACTION_NEUTRAL) return false;  // enabled "Extend civilians behaviour" by Xtendo-com. Hardcodes that civilians don't has inventory
 	return (_armor->hasInventory());
 }
 

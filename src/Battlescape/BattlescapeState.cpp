@@ -919,6 +919,8 @@ void BattlescapeState::btnInventoryClick(Action *)
 		&& (_save->getSelectedUnit()->getOriginalFaction() == FACTION_PLAYER ||
 			_save->getSelectedUnit()->getRankString() != "STR_LIVE_TERRORIST"))
 	{
+		if (Options::battleExtenedCivilians && _save->getSelectedUnit()->getOriginalFaction() == FACTION_NEUTRAL) return; //enabled "Extend civilians behaviour" by Xtendo-com. You can't open civilian's inventory anymore
+		
 		// clean up the waypoints
 		if (_battleGame->getCurrentAction()->type == BA_LAUNCH)
 		{
