@@ -1,4 +1,6 @@
 en-GB:
+  STR_BATTLEADVANCEDSCANNER: "Advanced motion scanner"
+  STR_BATTLEADVANCEDSCANNER_DESC: "Locations of enemies, uncovered by scanner, will be marked as red boxes on the battlefield."
   STR_OPENXCOM: "OpenXcom"
   STR_NEW_GAME: "New Game"
   STR_LOAD_SAVED_GAME: "Load Game"
