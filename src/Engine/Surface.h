@@ -87,6 +87,8 @@ public:
 	void drawCircle(Sint16 x, Sint16 y, Sint16 r, Uint8 color);
 	/// Draws a filled polygon on the surface.
 	void drawPolygon(Sint16 *x, Sint16 *y, int n, Uint8 color);
+	//Draws a filled ellipse on the surface.
+	void drawEllipse(Sint16 x, Sint16 y, Sint16 rx, Sint16 ry, Uint8 color); //"Show blast radius" by redv
 	/// Draws a textured polygon on the surface.
 	void drawTexturedPolygon(Sint16 *x, Sint16 *y, int n, Surface *texture, int dx, int dy);
 	/// Draws a string on the surface.

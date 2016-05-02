@@ -48,6 +48,7 @@
 #include "../Interface/NumberText.h"
 #include "../Interface/Text.h"
 #include "../fmath.h"
+#include "../Engine/Logger.h"
 
 
 /*
@@ -107,6 +108,13 @@ Map::Map(Game *game, int width, int height, int x, int y, int visibleMapHeight) 
 	_scrollKeyTimer->onTimer((SurfaceHandler)&Map::scrollKey);
 	_camera->setScrollTimer(_scrollMouseTimer, _scrollKeyTimer);
 	
+	//"Show blast radius" by redv
+	_throwCrosshair = new Surface(width, height, x, y);
+	_throwFrame = new Surface(_spriteWidth, _spriteWidth / 2 - 1, 0, 0);	// _spriteHeight
+	_throwFrame->getCrop()->w = _spriteWidth;
+	_throwFrame->getCrop()->h = _spriteWidth / 2 - 1;	// _spriteHeight
+	//---
+	
 	_txtAccuracy = new Text(24, 9, 0, 0);
 	_txtAccuracy->setSmall();
 	_txtAccuracy->setPalette(_game->getScreen()->getPalette());
@@ -124,6 +132,12 @@ Map::~Map()
 	delete _arrow;
 	delete _message;
 	delete _camera;
+	
+	//"Show blast radius" by redv
+	delete _throwCrosshair;
+	delete _throwFrame;
+	//---
+	
 	delete _txtAccuracy;
 }
 
@@ -144,7 +158,12 @@ void Map::init()
 					   0, 0, b, f, f, f, b, 0, 0,
 					   0, 0, 0, b, f, b, 0, 0, 0,
 					   0, 0, 0, 0, b, 0, 0, 0, 0 };
-
+	
+	//"Show blast radius" by redv
+	_throwCrosshair->setPalette(getPalette());
+	_throwFrame->setPalette(getPalette());
+	//---
+	
 	_arrow = new Surface(9, 9);
 	_arrow->setPalette(this->getPalette());
 	_arrow->lock();
@@ -386,6 +405,26 @@ void Map::drawTerrain(Surface *surface)
 		_numWaypid->setPalette(getPalette());
 		_numWaypid->setColor(pathfinderTurnedOn ? _messageColor + 1 : Palette::blockOffset(1));
 	}
+	
+	//"Show blast radius" by redv
+	// preparation for drawing the blast radius
+	bool needDrawBlastRadius = false;
+	BattleAction *action = 0;
+	//Do not prepare drawing blast radius without perfoming aim
+	if ( (_cursorType == CT_THROW || //Applies for every object we can throw
+		  _cursorType == CT_WAYPOINT || //Applies for every waypoint weapon
+		  _cursorType == CT_AIM //Applies for every gun that can shoot
+		 ) && Options::battleShowBlastRadius)
+		//Check for blow radius will be perfomed later
+	{
+		Position selPosition;
+		getSelectorPosition(&selPosition);
+		action = _save->getBattleState()->getBattleGame()->getCurrentAction();
+		action->target = selPosition;
+		needDrawBlastRadius = drawBlastRadius(*action);
+	}
+	//---
+
 
 	surface->lock();
 	for (int itZ = beginZ; itZ <= endZ; itZ++)
@@ -1106,6 +1145,19 @@ void Map::drawTerrain(Surface *surface)
 						}
 						waypid++;
 					}
+					
+					//"Show blast radius" by redv
+					// Draw blast radius
+					if (needDrawBlastRadius)
+					{
+						_throwFrame->getCrop()->x = screenPosition.x;
+						_throwFrame->getCrop()->y = screenPosition.y;	// 40-32/2+1 = 25px. Otherwise tiles crossing by previous tiles.
+						_throwFrame->clear(); //clear already painted circle
+						SDL_BlitSurface(_throwCrosshair->getSurface(), _throwFrame->getCrop(), _throwFrame->getSurface(), 0);
+						clipCorners(_throwFrame);
+						_throwFrame->blitNShade(surface, screenPosition.x, screenPosition.y, 0);
+					}			
+					//---
 				}
 			}
 		}
@@ -1760,6 +1812,106 @@ void Map::resetCameraSmoothing()
 	_smoothingEngaged = false;
 }
 
+//"Show blast radius" by redv
+/**
++ * Drawing blast radius.
++ * @param Current action.
++ * @return False if nothing to draw. Else - True.
++ */
+bool Map::drawBlastRadius(const BattleAction& action)
+{
+	static Position oldBlastCenter(-1,-1,-1);
+	static int flashFrame = -1;
+  
+  int blastRadius = 0;
+  int damage = 0;
+  
+  // Get explosion radius from grenade.
+  if (action.weapon->getRules()->getBattleType() != BT_FIREARM)
+  	{
+	    if (action.weapon->getFuseTimer() < 0) //Don't show blast radius for not primed grenades
+			return false;
+   		blastRadius = action.weapon->getRules()->getExplosionRadius();
+	    damage = action.weapon->getRules()->getPower();
+  	}
+  // Other wise handle radius from rocket launcher like weapons
+  else if (
+      action.weapon->getRules()->getBattleType() == BT_FIREARM && // make sure that we check al weapon that can shoot
+      action.weapon->getAmmoItem() && //Check if human's rocket launcher have not empty ammo type inside like small or big rocket (without that you will get segmentation fault when you trying to get ammo quantity or explosion radious)
+      action.weapon->getAmmoItem()->getAmmoQuantity() > 0 && //if alien launcher has an ammo (since you can't change ammo type)
+      action.weapon->getAmmoItem()->getRules()->getExplosionRadius() > 0)
+  	  {
+         blastRadius = action.weapon->getAmmoItem()->getRules()->getExplosionRadius();
+	     damage = action.weapon->getAmmoItem()->getRules()->getPower();
+  	  }
+	
+	//check if damage is too low for forced specified in ruleset blast radious.
+	if (damage/10 < blastRadius)
+		blastRadius=damage/10;
+	
+	if (blastRadius <= 0)  return false;
+
+	Position blastCenter;
+	_camera->convertMapToScreen(action.target, &blastCenter);
+	blastCenter.x += _camera->getMapOffset().x + _spriteWidth / 2;
+	blastCenter.y += _camera->getMapOffset().y + _spriteWidth;	// _spriteHeight - _spriteWidth / 4;
+
+	// need to check, maybe surface already ready
+	if (oldBlastCenter == blastCenter && flashFrame == (_animFrame & 2))
+	{
+		return true;
+	}
+
+	oldBlastCenter = blastCenter;
+	flashFrame = _animFrame & 2;	// blinking 2 times slowly
+
+	Uint8 color1 = Palette::blockOffset(2)+3 + flashFrame;
+	Uint8 color2 = Palette::blockOffset(9)+2 + flashFrame;
+
+	// drawing of the crosshair
+	
+	_throwCrosshair->draw();
+	
+	Sint16 rx = 24 * blastRadius;
+	Sint16 ry = 12 * blastRadius;
+	
+	//Draw yellow blast radius
+	_throwCrosshair->drawEllipse(blastCenter.x, blastCenter.y, rx, ry, color2);
+	_throwCrosshair->drawEllipse(blastCenter.x, blastCenter.y, rx - 2, ry - 2, 0);
+	
+	_throwCrosshair->getCrop()->w = blastCenter.x + rx + _spriteWidth;
+	_throwCrosshair->getCrop()->h = blastCenter.y + ry + _spriteHeight;
+	_throwCrosshair->getCrop()->x = blastCenter.x - rx - _spriteWidth;
+	_throwCrosshair->getCrop()->y = blastCenter.y - ry - _spriteHeight;
+
+	return true;
+}
+//---
+	
+//"Show blast radius" by redv
+/**
+ * Clipping left and right corners.
++ * @param Surface.
+ */
+void Map::clipCorners(Surface *surface)
+{
+	Uint16 *pixels = (Uint16*)surface->getSurface()->pixels;
+	int pitch = surface->getSurface()->format->BytesPerPixel * surface->getSurface()->pitch / 2;
+	int last = surface->getWidth() * surface->getHeight() / 2 - 1;
+
+	for (int y = 0; y <= 6; ++y)
+		for (int x = 0; x <= 6 - y; ++x)
+		{
+			int top_left  = y * pitch + x;
+			int top_right = y * pitch + pitch - 1 - x;
+			pixels[top_left] = 0;	// top left corner
+			pixels[top_right] = 0;	// top right corner
+			pixels[last - top_left] = 0;	// bottom right corner
+			pixels[last - top_right] = 0;	// bottom left corner
+		}
+}
+//---
+	
 /**
  * Set the "explosion flash" bool.
  * @param flash should the screen be rendered in EGA this frame?

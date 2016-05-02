@@ -24,7 +24,10 @@
 
 namespace OpenXcom
 {
-
+//"Show blast radius" by redv
+struct BattleAction;
+//---
+	
 class SavedBattleGame;
 class Surface;
 class SurfaceSet;
@@ -49,6 +52,11 @@ private:
 	Game *_game;
 	SavedBattleGame *_save;
 	Surface *_arrow;
+
+	//"Show blast radius" by redv
+	Surface *_throwCrosshair, *_throwFrame;
+	//---
+
 	int _spriteWidth, _spriteHeight;
 	int _selectorX, _selectorY;
 	int _mouseX, _mouseY;
@@ -72,6 +80,14 @@ private:
 	int getTerrainLevel(Position pos, int size) const;
 	int _iconHeight, _iconWidth, _messageColor;
 	const std::vector<Uint8> *_transparencies;
+
+	//"Show blast radius" by redv
+	/// Drawing blast radius.
+	bool drawBlastRadius(const BattleAction& action);
+	/// Clipping left and right corners.
+	static void clipCorners(Surface *surface);
+	//---
+	
 public:
 	/// Creates a new map at the specified position and size.
 	Map(Game* game, int width, int height, int x, int y, int visibleMapHeight);
