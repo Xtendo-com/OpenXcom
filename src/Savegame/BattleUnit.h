@@ -88,7 +88,7 @@ private:
 	Surface *_cache[5];
 	bool _cacheInvalid;
 	int _expBravery, _expReactions, _expFiring, _expThrowing, _expPsiSkill, _expPsiStrength, _expMelee;
-	int improveStat(int exp);
+	int improveStat(int exp) const;
 	int _motionPoints;
 	int _scannedTurn; //advanced scanner by redv
 	int _kills;
@@ -329,7 +329,7 @@ public:
 	/// Adds one to the melee exp counter.
 	void addMeleeExp();
 	/// Updates the stats of a Geoscape soldier.
-	void updateGeoscapeStats(Soldier *soldier);
+	void updateGeoscapeStats(Soldier *soldier) const;
 	/// Check if unit eligible for squaddie promotion.
 	bool postMissionProcedures(SavedGame *geoscape);
 	/// Get the sprite index for the minimap
@@ -383,7 +383,7 @@ public:
 	/// Set the units's respawn flag.
 	void setRespawn(bool respawn);
 	/// Get the units's respawn flag.
-	bool getRespawn();
+	bool getRespawn() const;
 	/// Get the units's rank string.
 	std::string getRankString() const;
 	/// Get the geoscape-soldier object.
@@ -461,13 +461,13 @@ public:
 	/// Set the flag for "floor above me" meaning stop rendering bubbles.
 	void setFloorAbove(bool floor);
 	/// Get the flag for "floor above me".
-	bool getFloorAbove();
+	bool getFloorAbove() const;
 	/// Get any melee weapon we may be carrying, or a built in one.
 	BattleItem *getMeleeWeapon();
 	/// Use this function to check the unit's movement type.
 	MovementType getMovementType() const;
 	/// Checks if this unit is in hiding for a turn.
-	bool isHiding() {return _hidingForTurn; };
+	bool isHiding() const {return _hidingForTurn; };
 	/// Sets this unit is in hiding for a turn (or not).
 	void setHiding(bool hiding) { _hidingForTurn = hiding; };
 	/// Puts the unit in the corner to think about what he's done.

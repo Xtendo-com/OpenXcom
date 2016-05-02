@@ -1205,7 +1205,7 @@ void SavedBattleGame::addDestroyedObjective()
  * Returns whether the objectives are destroyed.
  * @return True if the objectives are destroyed.
  */
-bool SavedBattleGame::allObjectivesDestroyed()
+bool SavedBattleGame::allObjectivesDestroyed() const
 {
 	return (_objectivesNeeded > 0 && _objectivesDestroyed == _objectivesNeeded);
 }
@@ -1830,7 +1830,7 @@ void SavedBattleGame::resetTiles()
 /**
  * @return the tilesearch vector for use in AI functions.
  */
-const std::vector<Position> SavedBattleGame::getTileSearch()
+const std::vector<Position> &SavedBattleGame::getTileSearch() const
 {
 	return _tileSearch;
 }
@@ -1839,7 +1839,7 @@ const std::vector<Position> SavedBattleGame::getTileSearch()
  * is the AI allowed to cheat?
  * @return true if cheating.
  */
-bool SavedBattleGame::isCheating()
+bool SavedBattleGame::isCheating() const
 {
 	return _cheating;
 }
@@ -2030,7 +2030,7 @@ void SavedBattleGame::setObjectiveType(int type)
  * Get the objective type for the current battle.
  * @return the objective type.
  */
-SpecialTileType SavedBattleGame::getObjectiveType()
+SpecialTileType SavedBattleGame::getObjectiveType() const
 {
 	return (SpecialTileType)(_objectiveType);
 }
@@ -2100,7 +2100,7 @@ void SavedBattleGame::setCheatTurn(int turn)
 	_cheatTurn = turn;
 }
 
-bool SavedBattleGame::isBeforeGame()
+bool SavedBattleGame::isBeforeGame() const
 {
 	return _beforeGame;
 }

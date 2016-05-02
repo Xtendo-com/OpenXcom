@@ -1525,7 +1525,7 @@ void Map::calculateWalkingOffset(BattleUnit *unit, Position *offset)
   * @param size Size of the unit we want to get the level from.
   * @return terrainlevel.
   */
-int Map::getTerrainLevel(Position pos, int size)
+int Map::getTerrainLevel(Position pos, int size) const
 {
 	int lowestlevel = 0;
 
@@ -1748,7 +1748,7 @@ void Map::setWidth(int width)
  * Get the hidden movement screen's vertical position.
  * @return the vertical position of the hidden movement window.
  */
-int Map::getMessageY()
+int Map::getMessageY() const
 {
 	return _message->getY();
 }
@@ -1756,7 +1756,7 @@ int Map::getMessageY()
 /**
  * Get the icon height.
  */
-int Map::getIconHeight()
+int Map::getIconHeight() const
 {
 	return _iconHeight;
 }
@@ -1764,7 +1764,7 @@ int Map::getIconHeight()
 /**
  * Get the icon width.
  */
-int Map::getIconWidth()
+int Map::getIconWidth() const
 {
 	return _iconWidth;
 }
@@ -1775,7 +1775,7 @@ int Map::getIconWidth()
  * @param pos the map position to calculate the sound angle from.
  * @return the angle of the sound (280 to 440).
  */
-int Map::getSoundAngle(Position pos)
+int Map::getSoundAngle(Position pos) const
 {
 	int midPoint = getWidth() / 2;
 	Position relativePosition;
@@ -1813,7 +1813,7 @@ void Map::setBlastFlash(bool flash)
  * Checks if the screen is still being rendered in EGA.
  * @return if we are still in EGA mode.
  */
-bool Map::getBlastFlash()
+bool Map::getBlastFlash() const
 {
 	return _flashScreen;
 }

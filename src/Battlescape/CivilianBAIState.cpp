@@ -637,4 +637,5 @@ void CivilianBAIState::evaluateAIMode()
 
 	_AIMode = AI_ESCAPE;
 }
+
 }
