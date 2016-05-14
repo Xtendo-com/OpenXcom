@@ -1055,7 +1055,7 @@ void Map::drawTerrain(Surface *surface)
 									break;
 								}
 								// at this point, let's assume the shot is adjusted and set the text amber.
-								_txtAccuracy->setColor(Palette::blockOffset(1)-1);
+								_txtAccuracy->setColor(Palette::blockOffset(Pathfinding::yellow - 1)-1);
 
 								if (distance > upperLimit)
 								{
@@ -1068,7 +1068,7 @@ void Map::drawTerrain(Surface *surface)
 								else
 								{
 									// no adjustment made? set it to green.
-									_txtAccuracy->setColor(Palette::blockOffset(4)-1);
+									_txtAccuracy->setColor(Palette::blockOffset(Pathfinding::green - 1)-1);
 								}
 
 								bool outOfRange = distance > weapon->getMaxRange();
@@ -1093,7 +1093,7 @@ void Map::drawTerrain(Surface *surface)
 								if (accuracy <= 0 || outOfRange)
 								{
 									accuracy = 0;
-									_txtAccuracy->setColor(Palette::blockOffset(2)-1);
+									_txtAccuracy->setColor(Palette::blockOffset(Pathfinding::red - 1)-1);
 								}
 								ss << accuracy;
 								ss << "%";

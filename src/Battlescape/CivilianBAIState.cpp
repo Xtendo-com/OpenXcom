@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -639,3 +640,5 @@ void CivilianBAIState::evaluateAIMode()
 }
 
 }
+=======
+>>>>>>> upstream/master

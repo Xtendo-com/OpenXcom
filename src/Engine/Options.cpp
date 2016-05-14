@@ -118,8 +118,8 @@ void create()
 	_info.push_back(OptionInfo("battleNotifyDeath", &battleNotifyDeath, false));
 	_info.push_back(OptionInfo("showFundsOnGeoscape", &showFundsOnGeoscape, false));
 	_info.push_back(OptionInfo("allowResize", &allowResize, false));
-	_info.push_back(OptionInfo("windowedModePositionX", &windowedModePositionX, -1));
-	_info.push_back(OptionInfo("windowedModePositionY", &windowedModePositionY, -1));
+	_info.push_back(OptionInfo("windowedModePositionX", &windowedModePositionX, 0));
+	_info.push_back(OptionInfo("windowedModePositionY", &windowedModePositionY, 0));
 	_info.push_back(OptionInfo("borderless", &borderless, false));
 	_info.push_back(OptionInfo("captureMouse", (bool*)&captureMouse, false));
 	_info.push_back(OptionInfo("battleTooltips", &battleTooltips, true));
@@ -138,6 +138,7 @@ void create()
 	_info.push_back(OptionInfo("preferredVideo", (int*)&preferredVideo, VIDEO_FMV));
 	_info.push_back(OptionInfo("musicAlwaysLoop", &musicAlwaysLoop, false));
 	_info.push_back(OptionInfo("touchEnabled", &touchEnabled, false));
+	_info.push_back(OptionInfo("rootWindowedMode", &rootWindowedMode, false));
 
 	// advanced options
 	_info.push_back(OptionInfo("playIntro", &playIntro, true, "STR_PLAYINTRO", "STR_GENERAL"));
@@ -520,12 +521,15 @@ bool init(int argc, char *argv[])
 	s += "openxcom.log";
 	Logger::logFile() = s;
 	FILE *file = fopen(Logger::logFile().c_str(), "w");
-	if (!file)
+	if (file)
 	{
-		throw Exception(s + " not found");
+		fflush(file);
+		fclose(file);
 	}
-	fflush(file);
-	fclose(file);
+	else
+	{
+		Log(LOG_WARNING) << "Couldn't create log file, switching to stderr";
+	}
 	Log(LOG_INFO) << "Data folder is: " << _dataFolder;
 	Log(LOG_INFO) << "Data search is: ";
 	for (std::vector<std::string>::iterator i = _dataList.begin(); i != _dataList.end(); ++i)
@@ -536,14 +540,14 @@ bool init(int argc, char *argv[])
 	Log(LOG_INFO) << "Config folder is: " << _configFolder;
 	Log(LOG_INFO) << "Options loaded successfully.";
 
-	// pick up stuff in common
-	FileMap::load("common", CrossPlatform::searchDataFolder("common"), true);
-
 	return true;
 }
 
 void updateMods()
 {
+	// pick up stuff in common before-hand
+	FileMap::load("common", CrossPlatform::searchDataFolder("common"), true);
+
 	std::string modPath = CrossPlatform::searchDataFolder("standard");
 	Log(LOG_INFO) << "Scanning standard mods in '" << modPath << "'...";
 	_scanMods(modPath);
@@ -741,7 +745,7 @@ void mapResources()
 		std::set<std::string> circDepCheck;
 		_loadMod(modInfo, circDepCheck);
 	}
-	// pick up stuff in common
+	// TODO: Figure out why we still need to check common here
 	FileMap::load("common", CrossPlatform::searchDataFolder("common"), true);
 	Log(LOG_INFO) << "Resources files mapped successfully.";
 }
@@ -1055,6 +1059,12 @@ void backupDisplay()
 	Options::newHQXFilter = Options::useHQXFilter;
 	Options::newOpenGLShader = Options::useOpenGLShader;
 	Options::newXBRZFilter = Options::useXBRZFilter;
+	Options::newRootWindowedMode = Options::rootWindowedMode;
+	Options::newWindowedModePositionX = Options::windowedModePositionX;
+	Options::newWindowedModePositionY = Options::windowedModePositionY;
+	Options::newFullscreen = Options::fullscreen;
+	Options::newAllowResize = Options::allowResize;
+	Options::newBorderless = Options::borderless;
 }
 
 /**
@@ -1072,6 +1082,12 @@ void switchDisplay()
 	std::swap(useHQXFilter, newHQXFilter);
 	std::swap(useOpenGLShader, newOpenGLShader);
 	std::swap(useXBRZFilter, newXBRZFilter);
+	std::swap(rootWindowedMode, newRootWindowedMode);
+	std::swap(windowedModePositionX, newWindowedModePositionX);
+	std::swap(windowedModePositionY, newWindowedModePositionY);
+	std::swap(fullscreen, newFullscreen);
+	std::swap(allowResize, newAllowResize);
+	std::swap(borderless, newBorderless);
 }
 
 }

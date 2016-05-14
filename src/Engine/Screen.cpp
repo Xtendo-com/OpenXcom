@@ -66,7 +66,7 @@ void Screen::makeVideoFlags()
 	}
 	
 	// Handle window positioning
-	if (Options::windowedModePositionX != -1 || Options::windowedModePositionY != -1)
+	if (!Options::fullscreen && Options::rootWindowedMode)
 	{
 		std::ostringstream ss;
 		ss << "SDL_VIDEO_WINDOW_POS=" << std::dec << Options::windowedModePositionX << "," << Options::windowedModePositionY;
@@ -92,11 +92,6 @@ void Screen::makeVideoFlags()
 	if (Options::borderless)
 	{
 		_flags |= SDL_NOFRAME;
-		SDL_putenv(const_cast<char*>("SDL_VIDEO_CENTERED=center"));
-	}
-	else
-	{
-		SDL_putenv(const_cast<char*>("SDL_VIDEO_CENTERED="));
 	}
 
 	_bpp = (is32bitEnabled() || isOpenGLEnabled()) ? 32 : 8;
