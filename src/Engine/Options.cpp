@@ -205,6 +205,7 @@ void create()
 	_info.push_back(OptionInfo("battleExtenedCivilians", &battleExtenedCivilians, false, "STR_BATTLEEXTENEDCIVILIANS", "STR_BATTLESCAPE")); //Extend civilians behaviour by Xtendo-com.
 	_info.push_back(OptionInfo("battleIncreaseSurvivability", &battleIncreaseSurvivability, false, "STR_BATTLEINCREASESURVIVABILITY", "STR_BATTLESCAPE")); //"Increase survivability of x-com soldiers" by Xtendo-com
 	_info.push_back(OptionInfo("battleUnconsciousNoPulse", &battleUnconsciousNoPulse, false, "STR_BATTLEUNCONSCIOUSNOPULSE", "STR_BATTLESCAPE")); //"No pulse in unconscious state" by Xtendo-com.
+	_info.push_back(OptionInfo("battleShowBlastRadius", &battleShowBlastRadius, false, "STR_BATTLESHOWBLASTRADIUS", "STR_BATTLESCAPE")); //"Show blast radius" by redv
 	
 	// controls
 	_info.push_back(OptionInfo("keyOk", &keyOk, SDLK_RETURN, "STR_OK", "STR_GENERAL"));

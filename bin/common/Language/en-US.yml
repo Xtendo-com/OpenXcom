@@ -11,6 +11,8 @@ en-US:
   STR_BATTLEINCREASESURVIVABILITY_DESC: "Healthly soldier with high morale and bravery has a chance to lose consciousness instead of dying after a mortal hit. Soldiers with high bravery are more likely to survive a mortal hit."
   STR_BATTLEUNCONSCIOUSNOPULSE: "No pulse in unconscious state"
   STR_BATTLEUNCONSCIOUSNOPULSE_DESC: "Human lose pulse in unconscious state and lose HP to death. You need to use stimulators from medikit in that case."
+  STR_BATTLESHOWBLASTRADIUS: "Show blast radius"
+  STR_BATTLESHOWBLASTRADIUS_DESC: "Shows blast radius for every weapon that have a blast radius (grenades, high explosive, rocket launchers, etc)"
   STR_OPENXCOM: "OpenXcom"
   STR_NEW_GAME: "New Game"
   STR_LOAD_SAVED_GAME: "Load Game"
